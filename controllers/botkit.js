@@ -1170,6 +1170,18 @@ controller.storage.teams.all(function(err,teams) {
         });
     };
 
+    var adminSessionExpired = function(bot, userId) {
+        var expSess = userStatus[userId].session.title;
+        delete userStatus[userId];
+        bot.startPrivateConversation({user: userId}, function (err, convo) {
+            if (err) {
+                console.log(err);
+            } else {
+                convo.say('You look busy. When you want, use `status` to explore your sessions and select one with `set up session <Session_ID>`');
+            }
+        });
+    };
+
     controller.hears(['create session (.*)','new session (.*)'], 'direct_message', function (bot, message) {
         isAdmin(message.user, message.team, function (isRoot, user) {
             if (!isRoot) {
