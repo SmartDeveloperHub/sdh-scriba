@@ -662,31 +662,71 @@ controller.storage.teams.all(function(err,teams) {
         }
     ];
     var userFinishedHelp = [];
-            } else {
-                t = [
-                    {
-                        "title": "help",
-                        "value": 'Say `help` to ScriBot',
-                        "short": true
-                    },
-                    {
-                        "title": "Add new Question",
-                        "value": 'Write your questions in quotes (e.g "Give me SDH information") ',
-                        "short": true
-                    },
-                    {
-                        "title": "Remove Question",
-                        "value": 'Write `remove` or `delete` and follow the instructions ',
-                        "short": true
-                    },
-                    {
-                        "title": "Check your questions",
-                        "value": 'write `status` or `my questions` to check your saved questions',
-                        "short": true
-                    }
-                ];
+    var sendUserHelp = function sendUserHelp (bot, message) {
+        // user info
+        controller.storage.users.get(message.user, message.team, function(err, user) {
+            if (err) {
+                console.log("error getting user info: " + message.user);
+                //replyUserHelp(bot, message, globalHelp, null);
+                bot.reply(message, "Hi <@" + message.user + ">, by the moment I haven't any session for you. When a session is started I will notify you personally");
             }
-            cb(t);
+            if (!user) {
+                console.log("user not found " + message.user);
+                //replyUserHelp(bot, message, globalHelp, null);
+                bot.reply(message, "Hi <@" + message.user + ">, by the moment I haven't any session for you. When a session is started I will notify you personally");
+            } else {
+                // activeSession: the session, the last interaction and timer or undefined
+                var activeSession = userStatus[message.user];
+                if (!activeSession) {
+                    // Regular Help
+                    if (user.isRoot) {
+                        // Admin or Organizer.
+                        replyUserHelp(bot, message, null, adminHelp);
+                    } else {
+                        replyUserHelp(bot, message, userHelp, null);
+                    }
+                } else {
+                    // This user has an active session!
+                    var sessionMoment = getSessionMoment(activeSession.session);
+                    var uh = globalHelp;
+                    var ah = adminHelp;
+                    switch(sessionMoment) {
+                        case "boot":
+                            console.log('help for boot creation session (Only admins)');
+                            // Only Orgaizers and admins can ask for help in this session step
+                            ah = ah.concat(adminBootstrapHelp);
+                            break;
+                        case "corpus":
+                            console.log('help for corpus creation session');
+                            uh = uh.concat(userCorpusHelp);
+                            ah = ah.concat(adminCorpusHelp);
+                            break;
+                        case "curate":
+                            console.log('help for curate session');
+                            uh = uh.concat(userCurateHelp);
+                            ah = ah.concat(adminCurateHelp);
+                            break;
+                        case "feedback":
+                            console.log('help for feedback session');
+                            uh = uh.concat(userFeedbackHelp);
+                            ah = ah.concat(adminFeedbackHelp);
+                            break;
+                        case "finished":
+                            console.log('help for finished session');
+                            uh = uh.concat(userFinishedHelp);
+                            ah = ah.concat(adminFinishedHelp);
+                            break;
+                    }
+                    if (user.isRoot) {
+                        // Admin or Organizer.
+                        replyUserHelp(bot, message, uh, ah);
+                    } else {
+                        replyUserHelp(bot, message, uh, null);
+                    }
+                }
+            }
+        });
+    };
 
         });
 };
