@@ -780,8 +780,9 @@ var getHelpFields = function getHelpFields (message, cb) {
         });
     });
 
-/* ADMIN. SET SESSION */
-     var createNewSession = function(title, purpose, owner, facets, botId, cb) {
+
+/* Admin SESSION */
+     var createNewSession = function createNewSession(title, purpose, owner, facets, botId, cb) {
         var newSession = {
             topic: {
                 title: title,
@@ -795,8 +796,8 @@ var getHelpFields = function getHelpFields (message, cb) {
             QProviders: [],
             FProviders: [],
             questionCorpus: [],
-            feedbackGatheringPeriod: {from: null, to: null},
-            corpusFormationPeriod: {from: null, to: null}
+            CFPeriod: {from: null, to: null},    // Corpus Formation Period
+            FGPeriod: {from: null, to: null}, // Feedback Gathering Period
         };
         controller.storage.sessions.save(newSession, function (err, session) {
             if (err) {
