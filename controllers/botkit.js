@@ -1258,6 +1258,61 @@ controller.storage.teams.all(function(err,teams) {
         });
     });
 
+
+
+/* Timers & Session Controllers */
+// Init sessions
+var allSessions = [];
+var userStatus = [];
+controller.storage.sessions.all(function (err, sessions) {
+    if (err) {
+        console.log('Error loading all sessions ');
+    } else {
+        console.log("** Init Sessions **");
+        console.log(sessions);
+        for (var i = 0; i < sessions.length; i++) {
+            var ses = sessions[i];
+            if (ses.state == '') {
+
+            }
+        }
+    }
+});
+
+// Active process by events
+const util = require('util');
+const EventEmitter = require('events');
+
+function MyStream() {
+    EventEmitter.call(this);
+}
+
+util.inherits(MyStream, EventEmitter);
+
+MyStream.prototype.write = function(data) {
+    this.emit('data', data);
+};
+
+var stream = new MyStream();
+
+console.log(stream instanceof EventEmitter); // true
+console.log(MyStream.super_ === EventEmitter); // true
+
+stream.on('data', function(data) {
+    console.log('Received data: "${data}"');
+});
+stream.write('It works!'); // Received data: "It works!"
+
+
+/*var ringBell = function ringBell() {
+    console.log('ring ring ring');
+}
+eventEmitter.on('doorOpen', ringBell);
+
+eventEmitter.emit('doorOpen');*/
+
+
+/* DEPRECATED */
     controller.on('channel_joined',function(bot, channelEv) {
         var chid = channelEv.channel.id;
         var creator = channelEv.channel.creator;
