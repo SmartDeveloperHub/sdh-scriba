@@ -906,8 +906,8 @@ controller.storage.teams.all(function(err,teams) {
 
     });
 
-/* ADD/REMOVE organizers */
-    controller.hears(['add organizer <@(.*)>'], 'direct_message', function (bot, message) {
+/* Admin tools ADD/REMOVE organizers */
+    controller.hears(['add organizer <@(.*)>','add admin <@(.*)>'], 'direct_message', function (bot, message) {
         var a1 = function(user) {
             if(user.isRoot) {
                 bot.reply(message, '@' + user.name + ' is already organizer.');
@@ -959,7 +959,7 @@ controller.storage.teams.all(function(err,teams) {
             }
         });
     });
-    controller.hears(['rm organizer <@(.*)>'], 'direct_message', function (bot, message) {
+    controller.hears(['rm organizer <@(.*)>','add organizer <@(.*)>'], 'direct_message', function (bot, message) {
         var a1 = function(user) {
             if(!user.isRoot) {
                 bot.reply(message, 'sorry, @' + user.name + ' is not admin.');
@@ -1062,56 +1062,10 @@ controller.storage.teams.all(function(err,teams) {
         });
     };
 
-    var showSessionAdminHelp = function(bot, message, session) {
-        bot.reply(message, {
-            text: "Now, you can configurate your session",
-            attachments: [
-                {
-                    "mrkdwn_in": ["text", "fields", 'fallback'],
-                    "fallback": "Create session bot feedback",
-                    "author_name": session.topic.title,
-                    //"author_link": "http",
-                    "author_icon": "http://www.sur54.com.ar/data/upload/news_thumbs/1349385713-600pluma_escrito_thumb_550.jpg",
-                    "text": session.topic.purpose,
-                    // TODO. Crear una estructura de datos, que contenga todos los posibles comandos del bot, en qué
-                    // momento y para qué usuarios se pueden utilizar. Ej. Add Question Provider... solo lo pueden usar
-                    // organizers, en el contexto de una sessión, y solo se puede en las fases previas a la fase de Corpus Formation.
-                    "fields": [
-                        {
-                            "title": "´´´add QP [@uid]```",
-                            "value": "Add Question Providers in the session, eg: ´´´add qp <@" + message.user + ">´´´",
-                            "short": true
-                        },
-                        {
-                            "title": "´´´add FP [@uid]```",
-                            "value": "Add Feedback Providers in the session, eg: ´´´add qp <@" + message.user + ">´´´",
-                            "short": true
-                        },
-                        {
-                            "title": "´´´set Title```",
-                            "value": "Change session title",
-                            "short": true
-                        },
-                        {
-                            "title": "´´´set Purpose```",
-                            "value": "Change session purpose",
-                            "short": true
-                        },
-                        {
-                            "title": "´´´set Purpose```",
-                            "value": "Change session purpose",
-                            "short": true
-                        }
-                    ]
-                }
-            ]
-        });
-    };
-
     var askForSessionPurpose = function askForSessionPurpose(bot, message, user, sessionTitle, cb) {
         bot.startConversation(message, function (err, convo) {
             //convo.ask('Do you want to add a *purpose* in your new session *' + sessionTitle + "*?", [
-            convo.ask('Now, you can Do you want to add a *purpose* in your new session *' + sessionTitle + "*?", [
+            convo.ask('Do you want to add a *purpose* in your new session *' + sessionTitle + "*?", [
                 {
                     pattern: bot.utterances.yes,
                     callback: function (response, convo) {
@@ -1154,7 +1108,7 @@ controller.storage.teams.all(function(err,teams) {
 
     var askForSessionFacets = function askForSessionFacets(bot, message, user, sessionTitle, cb) {
         bot.startConversation(message, function (err, convo) {
-            convo.ask('Do you want to add *facets* for your new session *' + sessionTitle + "*?. Facets will be used to Session-Questions categorization", [
+            convo.ask('Do you want to add *facets* for your new session *' + sessionTitle + "*?.\nFacets will be used to Session-Questions categorization", [
                 {
                     pattern: bot.utterances.yes,
                     callback: function (response, convo) {
@@ -1279,15 +1233,18 @@ controller.storage.teams.all(function(err,teams) {
                         if (err) {
                             console.log("no topic");
                             sessionTopic = "";
+                        } else {
+                            //bot.reply(message, "*" + sessionTitle + "*\n" + sessionTopic);
                         }
                         askForSessionFacets(bot, message, user, sessionTitle, function(err, facets) {
                             if (err) {
                                 console.log("no facets");
                                 facets = [];
                             }
+                            bot.reply(message, "...creating new session *" + sessionTitle + "* topic: *" + sessionTopic + "*");
                             createNewSession(sessionTitle, sessionTopic, facets, user, bot.identity.id, function(err, newSession) {
                                 if (err) {
-                                    convo.say("No session has been created... try again if you want");
+                                    convo.say("Something is wrong, no session has been created... try again if you want");
                                     return;
                                 }
                                 allSessions.push(newSession);
@@ -1324,7 +1281,7 @@ controller.storage.teams.all(function(err,teams) {
                         if (res.ok) {
                             console.log("new Channel topic: " + res.topic);
                         } else {
-                            console.log("Error changing channle topic");
+                            console.log("Error changing channel topic");
                         }
                      });
                      // set Topic
@@ -1336,7 +1293,7 @@ controller.storage.teams.all(function(err,teams) {
                         }
                      });
                      // postMessage
-                     var ms = "Hello! I'm  ´@" + bot.identity.name + " help´ to see what I can do";
+                     var ms = "Hello! I'm  `@" + bot.identity.name + " help` to see what I can do";
                      bot.api.chat.postMessage(channel, ms, function(err, res) {
                          if (err) {
                              console.log(err);
