@@ -567,6 +567,101 @@ controller.storage.teams.all(function(err,teams) {
             "short": true
         }
     ];
+    var adminCorpusHelp = [
+        {
+            "title": "Add Feedback Providers for this session",
+            "value": ">>>" + "`add FP [@uid]`",
+            "short": true
+        },
+        {
+            "title": "Set feedback period, (date format <dd-mm-yyyy MM:HH> or other ISO_8601)",
+            "value": ">>>" + "`set feedback from 23-05-2016 10:00 to 27-05-2016 15:00`",
+            "short": true
+        },
+        {
+            "title": "Show current corpus questions status",
+            "value": ">>>" + "`corpus status`",
+            "short": true
+        }
+    ];
+    var adminCurateHelp = [
+        {
+            "title": "Add Feedback Providers for this session",
+            "value": ">>>" + "`add FP [@uid]`",
+            "short": true
+        },
+        {
+            "title": "Set feedback period, (date format <dd-mm-yyyy MM:HH> or other ISO_8601)",
+            "value": ">>>" + "`set feedback from 23-05-2016 10:00 to 27-05-2016 15:00`",
+            "short": true
+        },
+        {
+            "title": "Show corpus questions",
+            "value": ">>>" + "`corpus status`",
+            "short": true
+        }
+    ];
+    var adminFeedbackHelp = [
+        {
+            "title": "Show corpus questions",
+            "value": ">>>" + "`corpus status`",
+            "short": true
+        },
+        {
+            "title": "Show current feedback status",
+            "value": ">>>" + "`feedback status`",
+            "short": true
+        }
+    ];
+    var adminFinishedHelp = [
+        {
+            "title": "Show corpus questions",
+            "value": ">>>" + "`corpus status`",
+            "short": true
+        },
+        {
+            "title": "Show feedback status",
+            "value": ">>>" + "`feedback status`",
+            "short": true
+        },
+        {
+            "title": "Session Result",
+            "value": ">>>" + "`session results`",
+            "short": true
+        }
+    ];
+    // User help
+    var userCorpusHelp = [
+        {
+            "title": 'Show your questions',
+            "value": ">>>" + '`my questions`',
+            "short": true
+        },
+        {
+            "title": 'Add new question in session corpus',
+            "value": ">>>" + 'Write your questions in quotes (e.g `add question "Give me SDH information"`)',
+            "short": true
+        },
+        {
+            "title": 'Remove one of your question',
+            "value": ">>>" + '`remove Question <QID>`',
+            "short": true
+        }
+    ];
+    var userCurateHelp = [];
+    var userFeedbackHelp = [
+        {
+            "title": "Start answering questions",
+            "value": ">>>" + "`ready`",
+            "short": true
+        },
+        {
+            "title": "Show feedback session status",
+            "value": ">>>" + "`status`",
+            "short": true
+        }
+    ];
+    var userFinishedHelp = [];
             } else {
                 t = [
                     {
