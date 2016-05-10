@@ -759,11 +759,27 @@ controller.storage.teams.all(function(err,teams) {
         });
     };
 
-/* GENRAL */
-    controller.hears(['help'], 'direct_message', function (bot, message) {
-        getHelpFields(message, sendUserHelp)
-        var sendUserHelp = function (t) {
-            var attach = [
+    var getSessionMoment = function getSessionMoment(session) {
+        var now = moment();
+        var cfFrom = moment(session.CFPeriod.from);
+        var cfTo = moment(session.CFPeriod.to);
+        var fgFrom = moment(session.FGPeriod.from);
+        var fgTo = moment(session.FGPeriod.to);
+
+        if (session.CFPeriod.from == null && session.CFPeriod.to == null ||
+            now < cfFrom) {
+            return "boot";
+        } else if (now > cfFrom && now < cfTo) {
+            return "corpus";
+        } else if (session.FGPeriod.from == null && session.FGPeriod.to == null ||
+                   now < fgFrom) {
+            return "curate";
+        } else if (now > fgFrom && now < fgTo) {
+            return "feedback";
+        } else if (now > fgTo) {
+            return "finished";
+        }
+    };
                 {
                     "fallback": "Help",
                     "author_name": "Scriba Help",
