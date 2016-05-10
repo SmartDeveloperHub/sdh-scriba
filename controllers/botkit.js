@@ -1208,13 +1208,29 @@ controller.storage.teams.all(function(err,teams) {
                             console.log("no facets");
                             facets = [];
                         }
-                        createNewSession(sessionTitle, sessionTopic, user, facets, bot.identity.id, function (err, newSession) {
-                            if (err) {
-                                console.log('Error creating new session. ' + err);
-                            } else {
+                            bot.reply(message, "...creating new session *" + sessionTitle + "* topic: *" + sessionTopic + "*");
+                            createNewSession(sessionTitle, sessionTopic, facets, user, bot.identity.id, function(err, newSession) {
+                                if (err) {
+                                    convo.say("Something is wrong, no session has been created... try again if you want");
+                                    return;
+                                }
+                                // TODO timeouts and global events
+                                // session expired for admin configs, corpus formation, feedback session, etc.
+                                allSessions.push(newSession);
+                                // This user is in this session context. With specific help, and commands. bootstrapping time
+                                userStatus[user.id] = {
+                                    session: newSession,
+                                    interact: "create",
+                                    timer: setTimeout(function(bot, userId) {
+                                        // emit expired session event
+                                        console.log("session expired for user: " + userId);
+                                        adminSessionExpired(bot, userId);
+                                    }.bind(this, bot, user.id),40000)
+                                };
+                                // TODO new help methods
                                 showSessionStatus(bot, message, newSession);
-                            }
-                        });
+                                replyUserHelp(bot, message, [], adminBootstrapHelp);
+                            });
                     });
                 });
             }
@@ -1259,9 +1275,22 @@ controller.storage.teams.all(function(err,teams) {
                                     convo.say("Something is wrong, no session has been created... try again if you want");
                                     return;
                                 }
+                                // TODO timeouts and global events
+                                // session expired for admin configs, corpus formation, feedback session, etc.
                                 allSessions.push(newSession);
+                                // This user is in this session context. With specific help, and commands. bootstrapping time
+                                userStatus[user.id] = {
+                                    session: newSession,
+                                    interact: "create",
+                                    timer: setTimeout(function(bot, userId) {
+                                        // emit expired session event
+                                        console.log("session expired for user: " + userId);
+                                        adminSessionExpired(bot, userId);
+                                    }.bind(this, bot, user.id),40000)
+                                };
+                                // TODO new help methods
                                 showSessionStatus(bot, message, newSession);
-                                showSessionAdminHelp();
+                                replyUserHelp(bot, message, [], adminBootstrapHelp);
                             });
                         });
                     });
