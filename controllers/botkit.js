@@ -1321,31 +1321,3 @@ controller.storage.teams.all(function(err,teams) {
         });
 
     });
-
-
-/* Timers & Session Controllers */
-// Init sessions
-var allSessions = [];
-var userStatus = [];
-controller.storage.sessions.all(function (err, sessions) {
-    if (err) {
-        console.log('Error loading all sessions ');
-    } else {
-        console.log("** Init Sessions **");
-        console.log(sessions);
-        for (var i = 0; i < sessions.length; i++) {
-            var ses = sessions[i];
-            if (ses.state == '') {
-
-            }
-        }
-    }
-});
-
-// Active process by events
-var ringBell = function ringBell() {
-    console.log('ring ring ring');
-}
-eventEmitter.on('doorOpen', ringBell);
-
-eventEmitter.emit('doorOpen');
