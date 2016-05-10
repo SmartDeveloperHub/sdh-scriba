@@ -728,8 +728,36 @@ controller.storage.teams.all(function(err,teams) {
         });
     };
 
+    var replyUserHelp = function replyUserHelp (bot, message, ufields, rfields) {
+
+        var attach = [];
+        // Organizator help
+        if (rfields) {
+            attach.push({
+                "fallback": "Organizator Help",
+                "color": "#F00",
+                "author_name": "Scriba Help",
+                "author_icon": "https://sdh.conwet.fi.upm.es/assets/images/sdh_400ppp_RGB_imagotipo_small.png",
+                "mrkdwn_in": ["fields", "fallback"],
+                "fields": rfields
+            });
+        };
+        // Regular user help
+        if (ufields) {
+            attach.push({
+                "fallback": "Help",
+                "color": "#008000",
+                "author_name": "Scriba Help",
+                "author_icon": "https://sdh.conwet.fi.upm.es/assets/images/sdh_400ppp_RGB_imagotipo_small.png",
+                "mrkdwn_in": ["fields", "fallback"],
+                "fields": ufields
+            });
+        };
+
+        bot.reply(message, {
+            "attachments": attach
         });
-};
+    };
 
 /* GENRAL */
     controller.hears(['help'], 'direct_message', function (bot, message) {
