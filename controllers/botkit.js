@@ -419,7 +419,19 @@ controller.storage.teams.all(function(err,teams) {
 
     var getBotStatus = function getBotStatus(bot, statuscb) {
         getUsersByRole(bot, function(admins, questioners, responders) {
-            getAllSessions(bot, function (pendingSessions, runningQSessions, curateSessions, runningASessions, finishedSessions) {
+            statuscb({
+                id: bot.identity.id,
+                avatar: bot.slack_user.profile.image_24,
+                team: {id: bot.team_info.id, name: bot.team_info.name},
+                created: bot.identity.created,
+                name: bot.identity.name,
+                messagecount: bot.msgcount,
+                admins: admins,
+                questioners: questioners,
+                responders: responders,
+                allSession: allSessions
+            });
+            /*getAllSessions(bot, function (pendingSessions, runningQSessions, curateSessions, runningASessions, finishedSessions) {
                 statuscb({
                     id: bot.identity.id,
                     avatar: bot.slack_user.profile.image_24,
@@ -436,7 +448,7 @@ controller.storage.teams.all(function(err,teams) {
                     runningASessions: runningASessions,
                     finishedSessions: finishedSessions
                 });
-            });
+            });*/
         });
     };
 
