@@ -31,6 +31,10 @@ var eventEmitter = new events.EventEmitter();
 var mongoUri = process.env.MONGOLAB_URI || 'mongodb://localhost/scriba_default';
 var botkit_mongo_storage = require('../botkit_mongo_storage')({mongoUri: mongoUri});
 
+// Events
+var events = require('events');
+var eventEmitter = new events.EventEmitter();
+
 if (!process.env.SLACK_ID || !process.env.SLACK_SECRET || !process.env.PORT) {
   console.log('Error: SLACK_ID SLACK_SECRET and PORT not found in environment');
   process.exit(1);
