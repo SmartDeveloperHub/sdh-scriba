@@ -488,27 +488,7 @@ controller.storage.teams.all(function(err,teams) {
                             },
                             {
                                 "title": "Active PendingSessions",
-                                "value": ">>>" + status.pendingSessions.length,
-                                "short": true
-                            },
-                            {
-                                "title": "Total RunningQSessions",
-                                "value": ">>>" + status.runningQSessions.length,
-                                "short": true
-                            },
-                            {
-                                "title": "Active CurateSessions",
-                                "value": ">>>" + status.curateSessions.length,
-                                "short": true
-                            },
-                            {
-                                "title": "Total RunningASessions",
-                                "value": ">>>" + status.runningASessions.length,
-                                "short": true
-                            },
-                            {
-                                "title": "Total FinishedSessions",
-                                "value": ">>>" + status.finishedSessions.length,
+                                "value": ">>>" + status.allSession.length,
                                 "short": true
                             }
                         ]
@@ -519,47 +499,74 @@ controller.storage.teams.all(function(err,teams) {
         });
     };
 
-var getHelpFields = function getHelpFields (message, cb) {
-    // user info
-    controller.storage.users.get(uid, team, function(err,user) {
-        if (err) {
-            console.log("error getting user info: " + uid);
-            //cb(false, user);
+    /* Help fields */
+    var globalHelp = [
+        {
+            "title": "Scriba Bot help",
+            "value": ">>>" + 'say `help`',
+            "short": true
         }
-        if (!user) {
-            console.log("user not found " + uid);
-            //cb(false, user);
-        } else {
-            //cb(user['isRoot'] == true, user);
+    ];
+    var adminHelp = [
+        {
+            "title": "Add new Admin. Admins can create and set up feedback sessions",
+            "value": ">>>" + '`add organizer @userid`',
+            "short": true
+        },
+        {
+            "title": 'Remove admin',
+            "value": ">>>" + '`rm admin @userid`',
+            "short": true
+        },
+        {
+            "title": "Create new Question-Answers Session",
+            "value": ">>>" + '`create session <session name>`',
+            "short": true
+        },
+        {
+            "title": "See all Sessions",
+            "value": ">>>" + "`sessions`",
+            "short": true
+        },
+        {
+            "title": "Select a session to set up",
+            "value": ">>>" + '`setup session <session id>`',
+            "short": true
+        },
+    ];
+    // Admin helps
+    var adminBootstrapHelp = [
+        {
+            "title": "Change session title",
+            "value": ">>>" + "`set Title`",
+            "short": true
+        },
+        {
+            "title": "Change session purpose",
+            "value": ">>>" + "`set Purpose`",
+            "short": true
+        },
+        {
+            "title": "Add Question Providers for this session",
+            "value": ">>>" + "`add QP [@uid]`",
+            "short": true
+        },
+        {
+            "title": "Set corpus formation period, (date format <dd-mm-yyyy MM:HH> or other ISO_8601)",
+            "value": ">>>" + "`set corpus from 23-05-2016 10:00 to 27-05-2016 15:00`",
+            "short": true
+        },
+        {
+            "title": "Add Feedback Providers for this session",
+            "value": ">>>" + "`add FP [@uid]`",
+            "short": true
+        },
+        {
+            "title": "Set feedback period, (date format <dd-mm-yyyy MM:HH> or other ISO_8601)",
+            "value": ">>>" + "`set feedback from 23-05-2016 10:00 to 27-05-2016 15:00`",
+            "short": true
         }
-    });
-
-    var t;
-
-        isAdmin(message.user, message.team, function(isAdd){
-            if (isAdd) {
-                t = [
-                    {
-                        "title": "help",
-                        "value": 'Say `help`',
-                        "short": true
-                    },
-                    {
-                        "title": "Add new Admin",
-                        "value": 'Write `add admin @userid`',
-                        "short": true
-                    },
-                    {
-                        "title": "Remove Admin",
-                        "value": 'Write `rm admin @userid`',
-                        "short": true
-                    },
-                    {
-                        "title": "Create new Question-Answers Session",
-                        "value": 'Write `new session <session name>`',
-                        "short": true
-                    }
-                ];
+    ];
             } else {
                 t = [
                     {
