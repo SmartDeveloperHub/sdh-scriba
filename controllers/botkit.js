@@ -780,18 +780,56 @@ controller.storage.teams.all(function(err,teams) {
             return "finished";
         }
     };
+
+    var showSessionAdminHelp = function(bot, message, session) {
+        bot.reply(message, {
+            text: "Now, you can configure your session",
+            attachments: [
                 {
-                    "fallback": "Help",
-                    "author_name": "Scriba Help",
-                    "author_icon": "https://sdh.conwet.fi.upm.es/assets/images/sdh_400ppp_RGB_imagotipo_small.png",
-                    "mrkdwn_in": ["fields", "fallback"],
-                    "fields": t
+                    "mrkdwn_in": ["text", "fields", 'fallback'],
+                    "fallback": "Create session bot feedback",
+                    "author_name": session.topic.title,
+                    //"author_link": "http",
+                    "author_icon": "http://www.sur54.com.ar/data/upload/news_thumbs/1349385713-600pluma_escrito_thumb_550.jpg",
+                    "text": session.topic.purpose,
+                    // TODO. Crear una estructura de datos, que contenga todos los posibles comandos del bot, en qué
+                    // momento y para qué usuarios se pueden utilizar. Ej. Add Question Provider... solo lo pueden usar
+                    // organizers, en el contexto de una sessión, y solo se puede en las fases previas a la fase de Corpus Formation.
+                    "fields": [
+                        {
+                            "title": "```add QP [@uid]```",
+                            "value": "Add Question Providers in the session, eg: ```add qp <@" + message.user + ">```",
+                            "short": true
+                        },
+                        {
+                            "title": "```add FP [@uid]```",
+                            "value": "Add Feedback Providers in the session, eg: ```add qp <@" + message.user + ">```",
+                            "short": true
+                        },
+                        {
+                            "title": "```set Title```",
+                            "value": "Change session title",
+                            "short": true
+                        },
+                        {
+                            "title": "```set Purpose```",
+                            "value": "Change session purpose",
+                            "short": true
+                        },
+                        {
+                            "title": "```set Purpose```",
+                            "value": "Change session purpose",
+                            "short": true
+                        }
+                    ]
                 }
-            ];
-            bot.reply(message, {
-                "attachments": attach
-            });
-        };
+            ]
+        });
+    };
+
+/* GENRAL */
+    controller.hears(['help'], 'direct_message', function (bot, message) {
+        sendUserHelp(bot, message);
     });
     controller.hears(['status'], 'direct_message,direct_mention', function (bot, message) {
         isAdmin(message.user, message.team, function(isRoot, user) {
