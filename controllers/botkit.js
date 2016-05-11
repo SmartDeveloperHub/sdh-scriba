@@ -668,12 +668,12 @@ controller.storage.teams.all(function(err,teams) {
             if (err) {
                 console.log("error getting user info: " + message.user);
                 //replyUserHelp(bot, message, globalHelp, null);
-                bot.reply(message, "Hi <@" + message.user + ">, by the moment I haven't any session for you. When a session is started I will notify you personally");
+                bot.reply(message, "Hi <@" + message.user + ">, by the moment I haven\'t any session for you. When a session is started I will notify you personally");
             }
             if (!user) {
                 console.log("user not found " + message.user);
                 //replyUserHelp(bot, message, globalHelp, null);
-                bot.reply(message, "Hi <@" + message.user + ">, by the moment I haven't any session for you. When a session is started I will notify you personally");
+                bot.reply(message, "Hi <@" + message.user + ">, by the moment I haven\'t any session for you. When a session is started I will notify you personally");
             } else {
                 // activeSession: the session, the last interaction and timer or undefined
                 var activeSession = userStatus[message.user];
@@ -845,65 +845,6 @@ controller.storage.teams.all(function(err,teams) {
                 }
             }
         });
-    });
-    controller.hears(['hello', 'hi'], 'direct_message', function (bot, message) {
-
-        bot.api.reactions.add({
-            timestamp: message.ts,
-            channel: message.channel,
-            name: 'robot_face',
-        }, function (err, res) {
-            if (err) {
-                bot.botkit.log('Failed to add emoji reaction :(', err);
-            }
-        });
-
-        controller.storage.users.get(message.user, message.team, function (err, user) {
-            if (user && user.name) {
-                bot.reply(message, 'Hello ' + user.name + '! say "help" to see what I can do');
-            } else {
-                bot.api.users.info({user: message.user}, function (err, res) {
-                    if (err) {
-                        log.error(err);
-                        return;
-                    }
-                    bot.reply(message, 'Hello ' + res.user.name + '! say "help" to see what I can do');
-                });
-            }
-        });
-    });
-    controller.hears(['call me (.*)'], 'direct_message', function (bot, message) {
-        var matches = message.text.match(/call me (.*)/i);
-        var name = matches[1];
-        controller.storage.users.get(message.user, message.team, function (err, user) {
-            if (!user) {
-                user = {
-                    id: message.user,
-                };
-            }
-            user.name = name;
-            controller.storage.users.save(user, message.team, function (err, id) {
-                bot.reply(message, 'Got it. I will call you ' + user.name + ' from now on.');
-            });
-        });
-    });
-    controller.hears(['what is my name', 'who am i'], 'direct_message', function (bot, message) {
-
-        controller.storage.users.get(message.user, message.team, message.team, function (err, user) {
-            if (user && user.name) {
-                bot.reply(message, 'Your name is ' + user.name);
-            } else {
-                bot.reply(message, 'I don\'t know yet!');
-            }
-        });
-    });
-    controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'], 'direct_message', function (bot, message) {
-
-        var hostname = os.hostname();
-        var uptime = formatUptime(process.uptime());
-
-        bot.reply(message, ':robot_face: I am a bot named <@' + bot.identity.name + '>. I have been running for ' + uptime + ' on ' + hostname + '.');
-
     });
 
 /* Admin tools ADD/REMOVE organizers */
@@ -1354,6 +1295,65 @@ eventEmitter.emit('doorOpen');*/
 
 
 /* DEPRECATED */
+    controller.hears(['hello', 'hi'], 'direct_message', function (bot, message) {
+
+        bot.api.reactions.add({
+            timestamp: message.ts,
+            channel: message.channel,
+            name: 'robot_face',
+        }, function (err, res) {
+            if (err) {
+                bot.botkit.log('Failed to add emoji reaction :(', err);
+            }
+        });
+
+        controller.storage.users.get(message.user, message.team, function (err, user) {
+            if (user && user.name) {
+                bot.reply(message, 'Hello ' + user.name + '! say "help" to see what I can do');
+            } else {
+                bot.api.users.info({user: message.user}, function (err, res) {
+                    if (err) {
+                        log.error(err);
+                        return;
+                    }
+                    bot.reply(message, 'Hello ' + res.user.name + '! say "help" to see what I can do');
+                });
+            }
+        });
+    });
+    controller.hears(['call me (.*)'], 'direct_message', function (bot, message) {
+        var matches = message.text.match(/call me (.*)/i);
+        var name = matches[1];
+        controller.storage.users.get(message.user, message.team, function (err, user) {
+            if (!user) {
+                user = {
+                    id: message.user,
+                };
+            }
+            user.name = name;
+            controller.storage.users.save(user, message.team, function (err, id) {
+                bot.reply(message, 'Got it. I will call you ' + user.name + ' from now on.');
+            });
+        });
+    });
+    controller.hears(['what is my name', 'who am i'], 'direct_message', function (bot, message) {
+
+        controller.storage.users.get(message.user, message.team, message.team, function (err, user) {
+            if (user && user.name) {
+                bot.reply(message, 'Your name is ' + user.name);
+            } else {
+                bot.reply(message, 'I don\'t know yet!');
+            }
+        });
+    });
+    controller.hears(['uptime', 'identify yourself', 'who are you', 'what is your name'], 'direct_message', function (bot, message) {
+
+        var hostname = os.hostname();
+        var uptime = formatUptime(process.uptime());
+
+        bot.reply(message, ':robot_face: I am a bot named <@' + bot.identity.name + '>. I have been running for ' + uptime + ' on ' + hostname + '.');
+
+    });
     controller.on('channel_joined',function(bot, channelEv) {
         var chid = channelEv.channel.id;
         var creator = channelEv.channel.creator;
