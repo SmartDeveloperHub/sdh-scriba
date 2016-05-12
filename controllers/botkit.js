@@ -1469,3 +1469,92 @@ eventEmitter.emit('doorOpen');*/
         });
     });
 */
+/*controller.hears(['remove', 'destroy'], 'direct_message', function (bot, message) {
+        if (message.user == 'USLACKBOT') {
+            return;
+        }
+        dbManager.findUserQuestions(message.user, function (result) {
+            startQuestions(result);
+        });
+        var startQuestions = function startQuestions(userMsgs) {
+            var attach = getQuestionsMarkdown(userMsgs);
+            bot.reply(message, {
+                "attachments": attach
+            });
+            bot.startConversation(message, function (err, convo) {
+                convo.ask('please, tell me the NUMBER of the question you want remove, ALL or ANY', [
+                    {
+                        pattern: /^(all)/,
+                        callback: function (response, convo) {
+                            bot.startConversation(message, function (err, convo2) {
+                                convo2.ask('Are you sure to remove ALL your questions?', [
+                                    {
+                                        pattern: bot.utterances.yes,
+                                        callback: function (response, convo) {
+                                            dbManager.deleteAllUserQuestion(message.user, function (result) {
+                                                convo.say("...deleting all your questions");
+                                                convo.next();
+                                            });
+                                        }
+                                    },
+                                    {
+                                        pattern: bot.utterances.no,
+                                        callback: function (response, convo) {
+                                            convo.say("No one question has been removed");
+                                            convo.next();
+                                        }
+                                    },
+                                    {
+                                        default: true,
+                                        callback: function (response, convo) {
+                                            convo.say("No one question has been removed");
+                                            convo.next();
+                                        }
+                                    },
+                                ]);
+
+                            });
+                            convo.next();
+                        }
+                    },
+                    {
+                        pattern: /^(any|none)/,
+                        callback: function (response, convo) {
+                            convo.say("No one question has been removed");
+                            convo.next();
+                        }
+                    },
+                    {
+                        // 0 - 99
+                        pattern: /^[1-9]/,
+                        callback: function (response, convo) {
+                            if (response.text === ("" + parseInt(response.text, 10))) {
+                                var um = userMsgs[parseInt(response.text, 10) - 1];
+                                if (!um) {
+                                    convo.say('This number does not correspond to any of your questions: ' + response.text);
+                                    convo.say("No one question has been removed");
+                                    convo.next();
+                                }else {
+                                    convo.say('...removing "' + um.question + '"');
+                                    dbManager.deleteQuestion(um.id, function() {
+                                        convo.next();
+                                    })
+                                }
+
+                            }
+                        }
+                    },
+                    {
+                        default: true,
+                        callback: function (response, convo) {
+                            convo.say("What?");
+                            // just repeat the question
+                            convo.repeat();
+                            convo.next();
+                        }
+                    }
+                ]);
+            });
+        };
+
+    });*/
