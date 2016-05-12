@@ -1430,3 +1430,42 @@ eventEmitter.emit('doorOpen');*/
         });
 
     });
+/*controller.on('direct_message', function (bot, message) {
+    console.log(message.text);
+});*/
+// reply to a direct message
+/*controller.on('direct_message', function (bot, message) {
+        if (message.text[0] !== '"' && message.text[message.text.length - 1] !== '"') {
+            return;
+        }
+        bot.startConversation(message, function (err, convo) {
+            convo.ask('Do you want to save this question?', [
+                {
+                    pattern: bot.utterances.yes,
+                    callback: function (response, convo) {
+                        dbManager.addQuestion(message, function() {
+                            convo.say('Saved!');
+                            convo.say('Thanks!');
+                            convo.next();
+                        });
+                    }
+                },
+                {
+                    pattern: bot.utterances.no,
+                    callback: function (response, convo) {
+                        convo.say("No problem, I've already forgotten");
+                        convo.next();
+                    }
+                },
+                {
+                    default: true,
+                    callback: function (response, convo) {
+                        convo.say("What?");
+                        convo.repeat();
+                        convo.next();
+                    }
+                },
+            ]);
+        });
+    });
+*/
