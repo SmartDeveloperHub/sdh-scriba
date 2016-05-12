@@ -240,135 +240,6 @@ controller.storage.teams.all(function(err,teams) {
         return [mdUser];
     };
 
-/*controller.on('direct_message', function (bot, message) {
-    console.log(message.text);
-});*/
-// reply to a direct message
-/*controller.on('direct_message', function (bot, message) {
-        if (message.text[0] !== '"' && message.text[message.text.length - 1] !== '"') {
-            return;
-        }
-        bot.startConversation(message, function (err, convo) {
-            convo.ask('Do you want to save this question?', [
-                {
-                    pattern: bot.utterances.yes,
-                    callback: function (response, convo) {
-                        dbManager.addQuestion(message, function() {
-                            convo.say('Saved!');
-                            convo.say('Thanks!');
-                            convo.next();
-                        });
-                    }
-                },
-                {
-                    pattern: bot.utterances.no,
-                    callback: function (response, convo) {
-                        convo.say("No problem, I've already forgotten");
-                        convo.next();
-                    }
-                },
-                {
-                    default: true,
-                    callback: function (response, convo) {
-                        convo.say("What?");
-                        convo.repeat();
-                        convo.next();
-                    }
-                },
-            ]);
-        });
-    });
-*/
-/*controller.hears(['remove', 'destroy'], 'direct_message', function (bot, message) {
-        if (message.user == 'USLACKBOT') {
-            return;
-        }
-        dbManager.findUserQuestions(message.user, function (result) {
-            startQuestions(result);
-        });
-        var startQuestions = function startQuestions(userMsgs) {
-            var attach = getQuestionsMarkdown(userMsgs);
-            bot.reply(message, {
-                "attachments": attach
-            });
-            bot.startConversation(message, function (err, convo) {
-                convo.ask('please, tell me the NUMBER of the question you want remove, ALL or ANY', [
-                    {
-                        pattern: /^(all)/,
-                        callback: function (response, convo) {
-                            bot.startConversation(message, function (err, convo2) {
-                                convo2.ask('Are you sure to remove ALL your questions?', [
-                                    {
-                                        pattern: bot.utterances.yes,
-                                        callback: function (response, convo) {
-                                            dbManager.deleteAllUserQuestion(message.user, function (result) {
-                                                convo.say("...deleting all your questions");
-                                                convo.next();
-                                            });
-                                        }
-                                    },
-                                    {
-                                        pattern: bot.utterances.no,
-                                        callback: function (response, convo) {
-                                            convo.say("No one question has been removed");
-                                            convo.next();
-                                        }
-                                    },
-                                    {
-                                        default: true,
-                                        callback: function (response, convo) {
-                                            convo.say("No one question has been removed");
-                                            convo.next();
-                                        }
-                                    },
-                                ]);
-
-                            });
-                            convo.next();
-                        }
-                    },
-                    {
-                        pattern: /^(any|none)/,
-                        callback: function (response, convo) {
-                            convo.say("No one question has been removed");
-                            convo.next();
-                        }
-                    },
-                    {
-                        // 0 - 99
-                        pattern: /^[1-9]/,
-                        callback: function (response, convo) {
-                            if (response.text === ("" + parseInt(response.text, 10))) {
-                                var um = userMsgs[parseInt(response.text, 10) - 1];
-                                if (!um) {
-                                    convo.say('This number does not correspond to any of your questions: ' + response.text);
-                                    convo.say("No one question has been removed");
-                                    convo.next();
-                                }else {
-                                    convo.say('...removing "' + um.question + '"');
-                                    dbManager.deleteQuestion(um.id, function() {
-                                        convo.next();
-                                    })
-                                }
-
-                            }
-                        }
-                    },
-                    {
-                        default: true,
-                        callback: function (response, convo) {
-                            convo.say("What?");
-                            // just repeat the question
-                            convo.repeat();
-                            convo.next();
-                        }
-                    }
-                ]);
-            });
-        };
-
-    });*/
-
     var getUsersFiltered = function getUsersFiltered(bot, attrib, value, cb) {
         var team = bot.team_info.id;
         controller.storage.users.all(team, function(err,users) {
@@ -401,7 +272,7 @@ controller.storage.teams.all(function(err,teams) {
         });
     };
 
-    var getAllSessions = function getAllSessions(bot, cb) {
+    /*var getAllSessions = function getAllSessions(bot, cb) {
         var team = bot.team_info.id;
         controller.storage.pendingSessions.all(team, function(err, pendingSessions) {
             controller.storage.runningQSessions.all(team, function(err, runningQSessions) {
@@ -414,7 +285,7 @@ controller.storage.teams.all(function(err,teams) {
                 });
             });
         });
-    };
+    };*/
 
     var getBotStatus = function getBotStatus(bot, statuscb) {
         getUsersByRole(bot, function(admins, questioners, responders) {
@@ -661,6 +532,7 @@ controller.storage.teams.all(function(err,teams) {
         }
     ];
     var userFinishedHelp = [];
+
     var sendUserHelp = function sendUserHelp (bot, message) {
         // user info
         controller.storage.users.get(message.user, message.team, function(err, user) {
@@ -833,12 +705,15 @@ controller.storage.teams.all(function(err,teams) {
     controller.hears(['status'], 'direct_message,direct_mention', function (bot, message) {
         isAdmin(message.user, message.team, function(isRoot, user) {
             if(!isRoot) {
+                // TODO session Active? -> questions, or feedback status... ad remove etc.
                 return;
             } else {
                 if (!user) {
-                    console.log('Weird error. Unknown user... but organizer???? no way.')
+                    console.log('Weird error. Unknown user... but organizer???? no way.');
+                    return;
                 } else {
                     getBotStatusMarkdown(bot, function(formatedMsg) {
+                        // TODO private reply... mentions
                         bot.reply(message, formatedMsg);
                     });
                 }
@@ -961,7 +836,7 @@ controller.storage.teams.all(function(err,teams) {
             FProviders: [],
             questionCorpus: [],
             CFPeriod: {from: null, to: null},    // Corpus Formation Period
-            FGPeriod: {from: null, to: null}, // Feedback Gathering Period
+            FGPeriod: {from: null, to: null},    // Feedback Gathering Period
         };
         controller.storage.sessions.save(newSession, function (err, session) {
             if (err) {
@@ -1110,7 +985,7 @@ controller.storage.teams.all(function(err,teams) {
         });
     };
 
-    var adminSessionExpired = function(bot, userId) {
+    var adminSessionExpired = function adminSessionExpired(bot, userId) {
         var expSess = userStatus[userId].session.title;
         delete userStatus[userId];
         bot.startPrivateConversation({user: userId}, function (err, convo) {
