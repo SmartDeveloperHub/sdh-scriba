@@ -38,11 +38,11 @@ module.exports = function(config) {
     var Teams = db(config.mongoUri).get('teams'); //default
     var Owners = db(config.mongoUri).get('owners');
     var Sessions = db(config.mongoUri).get('sessions');
-
+    var OldSessions = db(config.mongoUri).get('oldSessions');
     // Team entities
     var Users = {}; //default
     var Channels = {}; //default
-    var OldSessions = {};
+
     var PendingSessions = {};
     var RunningQSessions = {};
     var CurateSessions = {};
@@ -55,11 +55,6 @@ module.exports = function(config) {
         for (var i = 0; i < tl.length; i++) {
             Users[tl[i].id] = db(config.mongoUri).get('users-' + tl[i].id);
             Channels[tl[i].id] = db(config.mongoUri).get('channels-' + tl[i].id);
-            PendingSessions[tl[i].id] = db(config.mongoUri).get('pendingSessions-' + tl[i].id);
-            RunningQSessions[tl[i].id] = db(config.mongoUri).get('runningQSessions-' + tl[i].id);
-            CurateSessions[tl[i].id] = db(config.mongoUri).get('curateSessions-' + tl[i].id);
-            RunningASessions[tl[i].id] = db(config.mongoUri).get('runningASessions-' + tl[i].id);
-            FinishedSessions[tl[i].id] = db(config.mongoUri).get('finishedSessions-' + tl[i].id);
         }
     });
 
@@ -176,161 +171,6 @@ module.exports = function(config) {
                 Owners.find({}, cb);
             }
         },
-        pendingSessions: {
-            get: function(id, team, cb) {
-                if (!PendingSessions[team]) {
-                    console.log ('error searching <' + id + '> PendingSession. Unknown ' + team + ' team');
-                    cb('error searching for <' + id + '> PendingSession. Unknown ' + team + ' team');
-                } else {
-                    PendingSessions[team].findOne({id: id}, unwrapFromList(cb));
-                }
-            },
-            save: function(data, team, cb) {
-                if (!PendingSessions[team]) {
-                    console.log ('error saving <' + id + '> PendingSession. Unknown ' + team + ' team');
-                    cb('error saving  <' + id + '> PendingSession. Unknown ' + team + ' team');
-                } else {
-                    PendingSessions[team].findAndModify({
-                        id: data.id
-                    }, data, {
-                        upsert: true,
-                        new: true
-                    }, cb);
-                }
-            },
-            all: function(team, cb) {
-                if (!PendingSessions[team]) {
-                    console.log ('error searching all PendingSessions from unknown ' + team + ' team');
-                    cb('error searching all PendingSessions from unknown ' + team + ' team');
-                } else {
-                    PendingSessions[team].find({}, unwrapFromList(cb));
-                }
-            }
-        },
-        runningQSessions: {
-            get: function(id, team, cb) {
-                if (!RunningQSessions[team]) {
-                    console.log ('error searching <' + id + '> RunningQSessions. Unknown ' + team + ' team');
-                    cb('error searching for <' + id + '> RunningQSessions. Unknown ' + team + ' team');
-                } else {
-                    RunningQSessions[team].findOne({id: id}, unwrapFromList(cb));
-                }
-            },
-            save: function(data, team, cb) {
-                if (!RunningQSessions[team]) {
-                    console.log ('error saving <' + id + '> RunningQSessions. Unknown ' + team + ' team');
-                    cb('error saving  <' + id + '> RunningQSessions. Unknown ' + team + ' team');
-                } else {
-                    RunningQSessions[team].findAndModify({
-                        id: data.id
-                    }, data, {
-                        upsert: true,
-                        new: true
-                    }, cb);
-                }
-            },
-            all: function(team, cb) {
-                if (!RunningQSessions[team]) {
-                    console.log ('error searching all RunningQSessions from unknown ' + team + ' team');
-                    cb('error searching all RunningQSessions from unknown ' + team + ' team');
-                } else {
-                    RunningQSessions[team].find({}, unwrapFromList(cb));
-                }
-            }
-        },
-        curateSessions: {
-            get: function(id, team, cb) {
-                if (!CurateSessions[team]) {
-                    console.log ('error searching <' + id + '> CurateSessions. Unknown ' + team + ' team');
-                    cb('error searching for <' + id + '> CurateSessions. Unknown ' + team + ' team');
-                } else {
-                    CurateSessions[team].findOne({id: id}, unwrapFromList(cb));
-                }
-            },
-            save: function(data, team, cb) {
-                if (!CurateSessions[team]) {
-                    console.log ('error saving <' + id + '> CurateSessions. Unknown ' + team + ' team');
-                    cb('error saving  <' + id + '> CurateSessions. Unknown ' + team + ' team');
-                } else {
-                    CurateSessions[team].findAndModify({
-                        id: data.id
-                    }, data, {
-                        upsert: true,
-                        new: true
-                    }, cb);
-                }
-            },
-            all: function(team, cb) {
-                if (!CurateSessions[team]) {
-                    console.log ('error searching all CurateSessions from unknown ' + team + ' team');
-                    cb('error searching all CurateSessions from unknown ' + team + ' team');
-                } else {
-                    CurateSessions[team].find({}, unwrapFromList(cb));
-                }
-            }
-        },
-        runningASessions: {
-            get: function(id, team, cb) {
-                if (!RunningASessions[team]) {
-                    console.log ('error searching <' + id + '> RunningASessions. Unknown ' + team + ' team');
-                    cb('error searching for <' + id + '> RunningASessions. Unknown ' + team + ' team');
-                } else {
-                    RunningASessions[team].findOne({id: id}, unwrapFromList(cb));
-                }
-            },
-            save: function(data, team, cb) {
-                if (!RunningASessions[team]) {
-                    console.log ('error saving <' + id + '> RunningASessions. Unknown ' + team + ' team');
-                    cb('error saving  <' + id + '> RunningASessions. Unknown ' + team + ' team');
-                } else {
-                    RunningASessions[team].findAndModify({
-                        id: data.id
-                    }, data, {
-                        upsert: true,
-                        new: true
-                    }, cb);
-                }
-            },
-            all: function(team, cb) {
-                if (!RunningASessions[team]) {
-                    console.log ('error searching all RunningASessions from unknown ' + team + ' team');
-                    cb('error searching all RunningASessions from unknown ' + team + ' team');
-                } else {
-                    RunningASessions[team].find({}, unwrapFromList(cb));
-                }
-            }
-        },
-        finishedSessions: {
-            get: function(id, team, cb) {
-                if (!FinishedSessions[team]) {
-                    console.log ('error searching <' + id + '> FinishedSessions. Unknown ' + team + ' team');
-                    cb('error searching for <' + id + '> FinishedSessions. Unknown ' + team + ' team');
-                } else {
-                    FinishedSessions[team].findOne({id: id}, unwrapFromList(cb));
-                }
-            },
-            save: function(data, team, cb) {
-                if (!FinishedSessions[team]) {
-                    console.log ('error saving <' + id + '> FinishedSessions. Unknown ' + team + ' team');
-                    cb('error saving  <' + id + '> FinishedSessions. Unknown ' + team + ' team');
-                } else {
-                    FinishedSessions[team].findAndModify({
-                        id: data.id
-                    }, data, {
-                        upsert: true,
-                        new: true
-                    }, cb);
-                }
-            },
-            all: function(team, cb) {
-                if (!FinishedSessions[team]) {
-                    console.log ('error searching all FinishedSessions from unknown ' + team + ' team');
-                    cb('error searching all FinishedSessions from unknown ' + team + ' team');
-                } else {
-                    FinishedSessions[team].find({}, unwrapFromList(cb));
-                }
-            }
-        },
         sessions: {
             get: function(id, cb) {
                 Sessions.findOne({session_id: id}, unwrapFromList(cb));
@@ -353,34 +193,24 @@ module.exports = function(config) {
             }
         },
         oldSessions: {
-            get: function(id, team, cb) {
-                if (!OldSessions[team]) {
-                    console.log ('error searching <' + id + '> OldSessions. Unknown ' + team + ' team');
-                    cb('error searching for <' + id + '> OldSessions. Unknown ' + team + ' team');
-                } else {
-                    OldSessions[team].findOne({id: id}, unwrapFromList(cb));
-                }
+            get: function(id, cb) {
+                OldSessions.findOne({session_id: id}, unwrapFromList(cb));
             },
-            save: function(data, team, cb) {
-                if (!OldSessions[team]) {
-                    console.log ('error saving <' + id + '> OldSessions. Unknown ' + team + ' team');
-                    cb('error saving  <' + id + '> OldSessions. Unknown ' + team + ' team');
-                } else {
-                    OldSessions[team].findAndModify({
-                        id: data.id
-                    }, data, {
-                        upsert: true,
-                        new: true
-                    }, cb);
-                }
+            find: function(filter, cb) {
+                OldSessions.find(filter, unwrapFromList(cb));
             },
-            all: function(team, cb) {
-                if (!OldSessions[team]) {
-                    console.log ('error searching all OldSessions from unknown ' + team + ' team');
-                    cb('error searching all OldSessions from unknown ' + team + ' team');
-                } else {
-                    OldSessions[team].find({}, unwrapFromList(cb));
-                }
+            save: function(data, cb) {
+                console.log("mongoStorage... saving oldSession id: " + data.session_id + "; name: " + data.topic.title);
+                OldSessions.findAndModify({
+                    id: data.session_id
+                }, data, {
+                    upsert: true,
+                    new: true
+                }, cb);
+
+            },
+            all: function(cb) {
+                OldSessions.find({}, unwrapFromList(cb));
             }
         }
     };
