@@ -342,29 +342,29 @@ controller.storage.teams.all(function(err,teams) {
                                 "short": true
                             },
                             {
-                                "title": "Total Admins",
-                                "value": ">>>" + status.admins.length,
+                                "title": "Admins",
+                                "value": ">>>" + status.admins,
                                 "short": true
                             },
                             {
-                                "title": "Total Questioners",
-                                "value": ">>>" + status.questioners.length,
-                                "short": true
-                            },
-                            {
-                                "title": "Total Responders",
-                                "value": ">>>" + status.responders.length,
-                                "short": true
-                            },
-                            {
-                                "title": "Active PendingSessions",
+                                "title": "Active Sessions",
                                 "value": ">>>" + status.allSession.length,
+                                "short": true
+                            },
+                            {
+                                "title": "Question Providers",
+                                "value": ">>>" + status.QProviders.length,
+                                "short": true
+                            },
+                            {
+                                "title": "Feedback Providers",
+                                "value": ">>>" + status.FProviders.length,
                                 "short": true
                             }
                         ]
                     }
                 ]
-            }
+            };
             cb(md);
         });
     };
