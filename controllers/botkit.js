@@ -997,6 +997,93 @@ controller.storage.teams.all(function(err,teams) {
         });
     };
 
+    var replyAdminSessionsInfo = function replyAdminSessionsInfo(bot, message, user, cb) {
+        var attachs = [];
+        controller.storage.sessions.find({botFather:bot.identity.id}, function (err, sessions) {
+            if (err) {
+                console.log('Error searching sessions for ' + bot.identity.id + ' bot');
+                cb(err, attachs);
+            } else {
+                console.log("Sessions: " + sessions);
+                for (var i = 0; i < sessions.length; i++) {
+                    var sa = getSessionAttach(sessions[i]);
+                    attachs.push(sa);
+                }
+                cb(err, attachs);
+            }
+        });
+    };
+
+    var getSessionAttach = function(session) {
+        var fields = [
+            {
+                "title": "Created on",
+                "value": moment(session.creation).format("DD/MM/YYYY HH:MM"),
+                "short": true
+            }
+        ];
+
+        var sessionMoment = getSessionMoment(activeSession.session);
+        switch(sessionMoment) {
+            case "boot":
+                console.log('_boot session (Only admins)');
+                fields.push(
+                    {
+                        "title": "Question Corpus",
+                        "value": moment(session.CFPeriod.from).format("DD/MM/YYYY HH:MM") + " ---> " + moment(session.CFPeriod.to).format("DD/MM/YYYY HH:MM"),
+                        "short": true
+                    }
+                );
+                break;
+            case "corpus":
+                console.log('_corpus  session');
+                fields.push(
+                    {
+                        "title": "Question Corpus Formation Time",
+                        "value": "In progress. End " + moment(session.CFPeriod.to).toNow(),
+                        "short": true
+                    }
+                );
+                break;
+            case "curate":
+                console.log('_curate session');
+                fields.push(
+                    {
+                        "title": "Feedback Collect Time",
+                        "value": "In progress. End " + moment(session.CFPeriod.to).toNow(),
+                        "short": true
+                    }
+                );
+                break;
+            case "feedback":
+                console.log('_feedback session');
+                break;
+            case "finished":
+                console.log('_finished session');
+                break;
+        };
+        return [
+            {
+                "mrkdwn_in": ["text", "fields", 'fallback'],
+                "fallback": "This attachment show session info",
+                "color": randomColor(),
+                "author_name": "created by " + session.owner + ".  ",
+                "author_icon": "http://www.sur54.com.ar/data/upload/news_thumbs/1349385713-600pluma_escrito_thumb_550.jpg",
+                "title": session.topic.title,
+                "text": session.topic.purpose,//"Bot for *" + status.team.name + "* Slack Team" + "\n>>>Installed " + theCreat.fromNow() + " (" + theCreat.format('DD/MM/YYYY') + ")",
+                // Dates
+                "fields":[
+                    ,
+                    {
+                        "title": "Questions Corpus",
+                        "value": moment(session.creation).format("DD/MM/YYYY HH:MM"),
+                        "short": true
+                    }
+                ]
+            }
+        ];
+    };
+
     controller.hears(['create session (.*)','new session (.*)'], 'direct_message', function (bot, message) {
         isAdmin(message.user, message.team, function (isRoot, user) {
             if (!isRoot) {
@@ -1114,7 +1201,59 @@ controller.storage.teams.all(function(err,teams) {
         });
     });
 
-
+    controller.hears(['sessions','my sessions'], 'direct_message', function (bot, message) {
+        // user info
+        controller.storage.users.get(message.user, message.team, function(err, user) {
+            if (err) {
+                console.log("error getting user info: " + message.user);
+                bot.reply(message, "Hi <@" + message.user + ">, by the moment I haven\'t any session for you. When a session is started I will notify you personally");
+            }
+            if (!user) {
+                console.log("user not found " + message.user);
+                bot.reply(message, "Hi <@" + message.user + ">, by the moment I haven\'t any session for you. When a session is started I will notify you personally");
+            } else {
+                // activeSession: the session, the last interaction and timer or undefined
+                var activeSession = userStatus[message.user];
+                if (!activeSession) {
+                    // Regular Help
+                    if (user.isRoot) {
+                        // Admin or Organizer.
+                        replyAdminSessionsInfo(bot, message, user);
+                    } else {
+                        // Regular user without active session
+                        replyUserSessionsInfo(bot, message, user);
+                    }
+                } else {
+                    // with active session!
+                    // TODO get ALL user sessions, and create an atach for each one
+                    var sessionMoment = getSessionMoment(activeSession.session);
+                    //var sessionAttach = getSessionAttach(activeSession.session);
+                    switch(sessionMoment) {
+                        case "boot":
+                            console.log('boot session (Only admins)');
+                            break;
+                        case "corpus":
+                            console.log('corpus  session');
+                            break;
+                        case "curate":
+                            console.log('curate session');
+                            break;
+                        case "feedback":
+                            console.log('feedback session');
+                            break;
+                        case "finished":
+                            console.log('finished session');
+                            break;
+                    }
+                    if (user.isRoot) {
+                        // Admin or Organizer with an active session
+                    } else {
+                        // Regular user with an active session
+                    }
+                }
+            }
+        });
+    });
 
 /* Timers & Session Controllers */
 // Init sessions
