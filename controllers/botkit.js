@@ -31,9 +31,8 @@ var eventEmitter = new events.EventEmitter();
 var mongoUri = process.env.MONGOLAB_URI || 'mongodb://localhost/scriba_default';
 var botkit_mongo_storage = require('../botkit_mongo_storage')({mongoUri: mongoUri});
 
-// Events
-var events = require('events');
-var eventEmitter = new events.EventEmitter();
+// Random Colors
+var randomColor = require('randomcolor');
 
 if (!process.env.SLACK_ID || !process.env.SLACK_SECRET || !process.env.PORT) {
   console.log('Error: SLACK_ID SLACK_SECRET and PORT not found in environment');
@@ -461,7 +460,7 @@ controller.storage.teams.all(function(err,teams) {
                     {
                         "mrkdwn_in": ["text", "fields", 'fallback'],
                         "fallback": "This attachment show @" + status.name + " bot basic statistics and other relevant information",
-                        "color": "#36a64f",
+                        "color": randomColor(),
                         "author_name": status.name,
                         "author_icon": status.avatar,
                         "text": "Bot for *" + status.team.name + "* Slack Team" + "\n>>>Installed " + theCreat.fromNow() + " (" + theCreat.format('DD/MM/YYYY') + ")",
