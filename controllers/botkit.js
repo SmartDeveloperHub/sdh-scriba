@@ -340,7 +340,7 @@ controller.storage.teams.all(function(err,teams) {
                         "color": randomColor(),
                         "author_name": status.name,
                         "author_icon": status.avatar,
-                        "text": "Bot for *" + status.team.name + "* Slack Team" + "\n>>>Installed " + theCreat.fromNow() + " (" + theCreat.format('DD/MM/YYYY') + ")",
+                        "text": "Bot for *" + status.team.name + "* Slack Team" + "\n>>>Installed " + theCreat.fromNow() + " (" + theCreat.format('llll') + ")",
                         "fields": [
                             {
                                 "title": "Total Messages received",
@@ -428,7 +428,7 @@ controller.storage.teams.all(function(err,teams) {
             "short": true
         },
         {
-            "title": "Set corpus formation period, (date format <dd-mm-yyyy MM:HH> or other ISO_8601)",
+            "title": "Set corpus formation period, (date format <dd-mm-yyyy hh:mm> or other ISO_8601)",
             "value": ">>>" + "`set corpus from 23-05-2016 10:00 to 27-05-2016 15:00`",
             "short": true
         },
@@ -438,7 +438,7 @@ controller.storage.teams.all(function(err,teams) {
             "short": true
         },
         {
-            "title": "Set feedback period, (date format <dd-mm-yyyy MM:HH> or other ISO_8601)",
+            "title": "Set feedback period, (date format <dd-mm-yyyy hh:mm> or other ISO_8601)",
             "value": ">>>" + "`set feedback from 23-05-2016 10:00 to 27-05-2016 15:00`",
             "short": true
         }
