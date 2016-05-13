@@ -356,16 +356,6 @@ controller.storage.teams.all(function(err,teams) {
                                 "title": "Active Sessions",
                                 "value": ">>>" + status.allSession.length,
                                 "short": true
-                            },
-                            {
-                                "title": "Question Providers",
-                                "value": ">>>" + status.QProviders.length,
-                                "short": true
-                            },
-                            {
-                                "title": "Feedback Providers",
-                                "value": ">>>" + status.FProviders.length,
-                                "short": true
                             }
                         ]
                     }
