@@ -1121,11 +1121,7 @@ controller.storage.teams.all(function(err,teams) {
                                 userStatus[user.id] = {
                                     session: newSession,
                                     interact: "create",
-                                    timer: setTimeout(function(bot, userId) {
-                                        // emit expired session event
-                                        console.log("session expired for user: " + userId);
-                                        adminSessionExpired(bot, userId);
-                                    }.bind(this, bot, user.id),40000)
+                                    timer: setTimeout(launchSessionExpiration.bind(this, bot, user.id, newSession.topic.title),40000)
                                 };
                                 // TODO new help methods
                                 showSessionStatus(bot, message, newSession);
@@ -1182,11 +1178,7 @@ controller.storage.teams.all(function(err,teams) {
                                 userStatus[user.id] = {
                                     session: newSession,
                                     interact: "create",
-                                    timer: setTimeout(function(bot, userId) {
-                                        // emit expired session event
-                                        console.log("session expired for user: " + userId);
-                                        adminSessionExpired(bot, userId);
-                                    }.bind(this, bot, user.id),40000)
+                                    timer: setTimeout(launchSessionExpiration.bind(this, bot, user.id),40000)
                                 };
                                 // TODO new help methods
                                 showSessionStatus(bot, message, newSession);
@@ -1271,6 +1263,18 @@ controller.storage.sessions.all(function (err, sessions) {
         }
     }
 });
+
+var resetExpirationPeriod = function resetExpirationPeriod(bot, user, session, time) {
+    clearTimeout(session.timer);
+    session.timer = setTimeout(launchSessionExpiration.bind(null, bot, user.id),time);
+};
+
+var launchSessionExpiration = function launchSessionExpiration(bot, userId, sessionTitle) {
+    // emit expired session event
+    console.log("session " + sessionTitle + " expired for user: " + userId);
+    adminSessionExpired(bot, userId, sessionTitle);
+};
+
 
 // Active process by events
 const util = require('util');
