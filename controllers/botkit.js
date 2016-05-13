@@ -1054,49 +1054,56 @@ controller.storage.teams.all(function(err,teams) {
                 console.log('_corpus  session');
                 fields.push(
                     {
-                        "title": "Question Corpus Formation Time",
-                        "value": "In progress. End " + moment(session.CFPeriod.to).toNow(),
+                        "value": ">>>_Corpus Formation_ *in progress*. End " + moment(session.CFPeriod.to).toNow(),
                         "short": true
                     }
                 );
                 break;
             case "curate":
                 console.log('_curate session');
+                var fromV = "?";
+                var toV= "?";
+                if (session.CFPeriod.from && session.CFPeriod.to) {
+                    fromV = moment(session.FGPeriod.from).format("llll");
+                    toV = moment(session.FGPeriod.to).format("llll");
+                }
                 fields.push(
                     {
-                        "title": "Feedback Collect Time",
-                        "value": "In progress. End " + moment(session.CFPeriod.to).toNow(),
+                        "value": ">>>_Feedback Gathering_ " + fromV + " ---> " + toV,
                         "short": true
                     }
                 );
                 break;
             case "feedback":
                 console.log('_feedback session');
+                fields.push(
+                    {
+                        "value": ">>>_Feedback Gathering_ *in progress*. End " + moment(session.FGPeriod.to).toNow(),
+                        "short": true
+                    }
+                );
                 break;
             case "finished":
                 console.log('_finished session');
-                break;
-        };
-        return [
-            {
-                "mrkdwn_in": ["text", "fields", 'fallback'],
-                "fallback": "This attachment show session info",
-                "color": randomColor(),
-                "author_name": "created by " + session.owner + ".  ",
-                "author_icon": "http://www.sur54.com.ar/data/upload/news_thumbs/1349385713-600pluma_escrito_thumb_550.jpg",
-                "title": session.topic.title,
-                "text": session.topic.purpose,//"Bot for *" + status.team.name + "* Slack Team" + "\n>>>Installed " + theCreat.fromNow() + " (" + theCreat.format('DD/MM/YYYY') + ")",
-                // Dates
-                "fields":[
-                    ,
+                fields.push(
                     {
-                        "title": "Questions Corpus",
-                        "value": moment(session.creation).format("DD/MM/YYYY HH:MM"),
+                        "title": "FINISHED",
+                        "value": ">>>*Finished* " + moment(session.FGPeriod.to).fromNow(),
                         "short": true
                     }
-                ]
-            }
-        ];
+                );
+                break;
+        };
+        return {
+            "mrkdwn_in": ["text", "fields", 'fallback'],
+            "fallback": "This attachment show session info",
+            "color": randomColor(),
+            "author_icon": "http://www.sur54.com.ar/data/upload/news_thumbs/1349385713-600pluma_escrito_thumb_550.jpg",
+            "author_name": "Session: " + session.topic.title,
+            "text": "_Purpose_: " + session.topic.purpose + "\n_created by_ @" + session.owner.name,
+            // Dates
+            "fields": fields
+        };
     };
 
     controller.hears(['create session (.*)','new session (.*)'], 'direct_message', function (bot, message) {
@@ -1125,8 +1132,8 @@ controller.storage.teams.all(function(err,teams) {
                             console.log("no facets");
                             facets = [];
                         }
-                            bot.reply(message, "...creating new session *" + sessionTitle + "* topic: *" + sessionTopic + "*");
-                            createNewSession(sessionTitle, sessionTopic, facets, user, bot.identity.id, function(err, newSession) {
+                            bot.reply(message, "...creating new session *" + sessionTitle + "* topic: *" + sessionPurpose + "*");
+                            createNewSession(sessionTitle, sessionPurpose, user, facets, bot.identity.id, function(err, newSession) {
                                 if (err) {
                                     convo.say("Something is wrong, no session has been created... try again if you want");
                                     return;
