@@ -983,19 +983,19 @@ controller.storage.teams.all(function(err,teams) {
         });
     };
 
-    var adminSessionExpired = function adminSessionExpired(bot, userId) {
+    var adminSessionExpired = function adminSessionExpired(bot, userId, sessionTitle) {
         var expSess = userStatus[userId].session.title;
         delete userStatus[userId];
         bot.startPrivateConversation({user: userId}, function (err, convo) {
             if (err) {
                 console.log(err);
             } else {
-                convo.say('You look busy. When you want, use `status` to explore your sessions and select one with `set up session <Session_ID>`');
+                convo.say('You look busy. ' + sessionTitle + ' Session Expired.\nWhen you want, use `status` to explore your sessions and select one with `set up session <Session_ID>`');
             }
         });
     };
 
-    var replyAdminSessionsInfo = function replyAdminSessionsInfo(bot, message, user, cb) {
+    var replyAdminSessionsInfo = function replyAdminSessionsInfo(bot, message, user, activesessionId) {
         var attachs = [];
         controller.storage.sessions.find({botFather:bot.identity.id}, function (err, sessions) {
             if (err) {
