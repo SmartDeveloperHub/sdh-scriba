@@ -1004,31 +1004,48 @@ controller.storage.teams.all(function(err,teams) {
             } else {
                 console.log("Sessions: " + sessions);
                 for (var i = 0; i < sessions.length; i++) {
-                    var sa = getSessionAttach(sessions[i]);
-                    attachs.push(sa);
+                    var sa = getAdminSessionAttach(sessions[i]);
+                    if (sessions[i].session_id == activesessionId) {
+                        sa['title'] = "[ACTIVE!]";
+                        attachs.unshift(sa);
+                    } else {
+                        attachs.push(sa);
+                    }
                 }
-                cb(err, attachs);
+                if (attachs.length > 0) {
+                    bot.reply(message, { attachments: attachs});
+                } else {
+                    bot.reply(message, {text: "I don\'t have any session. Create a new one typing `create session`"});
+                }
             }
         });
     };
 
-    var getSessionAttach = function(session) {
+    var getAdminSessionAttach = function(session) {
         var fields = [
             {
-                "title": "Created on",
-                "value": moment(session.creation).format("DD/MM/YYYY HH:MM"),
+                "value": ">>>_Created on_ " + moment(session.creation).format("llll"),
                 "short": true
             }
         ];
 
-        var sessionMoment = getSessionMoment(activeSession.session);
+        var sessionMoment = getSessionMoment(session);
         switch(sessionMoment) {
             case "boot":
                 console.log('_boot session (Only admins)');
+                var fromV = "?";
+                var toV= "?";
+                var corpDates;
+                if (session.CFPeriod.from && session.CFPeriod.to) {
+                    fromV = moment(session.CFPeriod.from).format("llll");
+                    toV = moment(session.CFPeriod.to).format("llll");
+                    corpDates = "from " + fromV + ", to " + toV;
+                } else {
+                    corpDates = "period *undefined*. Set Q.Providers period. eg: `set corpus from 23-05-2016 10:00 to 27-05-2016 15:00`"
+                }
                 fields.push(
                     {
-                        "title": "Question Corpus",
-                        "value": moment(session.CFPeriod.from).format("DD/MM/YYYY HH:MM") + " ---> " + moment(session.CFPeriod.to).format("DD/MM/YYYY HH:MM"),
+                        "value": ">>>_Question Corpus_ " + corpDates,
                         "short": true
                     }
                 );
