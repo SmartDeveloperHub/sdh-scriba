@@ -1238,16 +1238,17 @@ controller.storage.teams.all(function(err,teams) {
                         replyUserSessionsInfo(bot, message, user);
                     }
                 } else {
-                    // with active session!
-                    // TODO get ALL user sessions, and create an atach for each one
+                    // User has an active session!
+                    resetExpirationPeriod(bot, user, activeSession, 40000);
                     var sessionMoment = getSessionMoment(activeSession.session);
-                    //var sessionAttach = getSessionAttach(activeSession.session);
+
+                    //bot.reply(message, "'You have an active session: " + activeSession.session.topic.title);
                     switch(sessionMoment) {
                         case "boot":
                             console.log('boot session (Only admins)');
                             break;
                         case "corpus":
-                            console.log('corpus  session');
+                            console.log('corpus session');
                             break;
                         case "curate":
                             console.log('curate session');
@@ -1261,6 +1262,8 @@ controller.storage.teams.all(function(err,teams) {
                     }
                     if (user.isRoot) {
                         // Admin or Organizer with an active session
+                        //var sessionAttach = getAdminSessionAttach(activeSession.session);
+                        replyAdminSessionsInfo(bot, message, user, activeSession.session_id);
                     } else {
                         // Regular user with an active session
                     }
