@@ -923,19 +923,21 @@ controller.storage.teams.all(function(err,teams) {
                 {
                     pattern: bot.utterances.yes,
                     callback: function (response, convo) {
-                        convo.ask('Great, type the new *facet* for *' + sessionTitle + "* session", [
+                        convo.ask('Great, type the new *facet/s* for *' + sessionTitle + "* session, separated by comma", [
                             {
                                 pattern: /(.*)/i,
                                 callback: function (response, convo) {
                                     convo.next();
-                                    cb(null, response.text);
+                                    var facetsArr = response.text.replaceAll(", ", ",").replaceAll(" ,", ",").split(',');
+                                    console.log(facetsArr);
+                                    cb(null, facetsArr);
                                 }
                             },
                             {
                                 default: true,
                                 callback: function (response, convo) {
                                     convo.next();
-                                    cb("no topic default");
+                                    cb("no default facets");
                                 }
                             }
                         ]);
