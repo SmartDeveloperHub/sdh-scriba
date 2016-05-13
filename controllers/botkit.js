@@ -45,6 +45,12 @@ var controller = Botkit.slackbot({
 
 exports.controller = controller;
 
+// String extra method
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 //CONNECTION FUNCTIONS=====================================================
 exports.connect = function(team_config) {
     var bot = controller.spawn(team_config);
