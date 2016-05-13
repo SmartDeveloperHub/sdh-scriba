@@ -1098,7 +1098,7 @@ controller.storage.teams.all(function(err,teams) {
                 });
             } else {
                 var sessionTitle = message.match[1];
-                askForSessionPurpose(bot, message, user, sessionTitle, function (err, sessionTopic) {
+                askForSessionPurpose(bot, message, user, sessionTitle, function (err, sessionPurpose) {
                     if (err) {
                         convo.say("No session has been created... try again if you want");
                         return;
@@ -1153,20 +1153,20 @@ controller.storage.teams.all(function(err,teams) {
                         convo.say("No session has been created... try again if you want");
                         return;
                     }
-                    askForSessionPurpose(bot, message, user, sessionTitle, function(err, sessionTopic) {
+                    askForSessionPurpose(bot, message, user, sessionTitle, function(err, sessionPurpose) {
                         if (err) {
                             console.log("no topic");
-                            sessionTopic = "";
+                            sessionPurpose = "";
                         } else {
-                            //bot.reply(message, "*" + sessionTitle + "*\n" + sessionTopic);
+                            //bot.reply(message, "*" + sessionTitle + "*\n" + sessionPurpose);
                         }
                         askForSessionFacets(bot, message, user, sessionTitle, function(err, facets) {
                             if (err) {
                                 console.log("no facets");
                                 facets = [];
                             }
-                            bot.reply(message, "...creating new session *" + sessionTitle + "* topic: *" + sessionTopic + "*");
-                            createNewSession(sessionTitle, sessionTopic, facets, user, bot.identity.id, function(err, newSession) {
+                            bot.reply(message, "...creating new session *" + sessionTitle + "* topic: *" + sessionPurpose + "*");
+                            createNewSession(sessionTitle, sessionPurpose, user, facets, bot.identity.id, function(err, newSession) {
                                 if (err) {
                                     convo.say("Something is wrong, no session has been created... try again if you want");
                                     return;
