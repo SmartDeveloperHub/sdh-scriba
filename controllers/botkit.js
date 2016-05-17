@@ -171,6 +171,11 @@ controller.on('rtm_close',function(bot) {
 
 controller.storage.teams.all(function(err,teams) {
     if (err) {
+        if (err.message.indexOf("failed to connect") >= 0) {
+            log.error("Error in Slack Bot internal storage. Check Mongo DB connection");
+            log.error(err);
+            process.exit(1);
+        }
         throw new Error(err);
     }
     // connect all teams with bots up to slack!
