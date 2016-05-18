@@ -608,7 +608,7 @@ controller.storage.teams.all(function(err,teams) {
             attach.push({
                 "fallback": "Organizator Help",
                 "color": "#F00",
-                "author_name": "Scriba Help",
+                "author_name": "Organizator Help",
                 "author_icon": "https://sdh.conwet.fi.upm.es/assets/images/sdh_400ppp_RGB_imagotipo_small.png",
                 "mrkdwn_in": ["fields", "fallback"],
                 "fields": rfields
@@ -619,7 +619,7 @@ controller.storage.teams.all(function(err,teams) {
             attach.push({
                 "fallback": "Help",
                 "color": "#008000",
-                "author_name": "Scriba Help",
+                "author_name": "Help",
                 "author_icon": "https://sdh.conwet.fi.upm.es/assets/images/sdh_400ppp_RGB_imagotipo_small.png",
                 "mrkdwn_in": ["fields", "fallback"],
                 "fields": ufields
