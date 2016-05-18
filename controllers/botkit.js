@@ -1014,7 +1014,7 @@ controller.storage.teams.all(function(err,teams) {
     };
 
     var adminSessionExpired = function adminSessionExpired(bot, userId, sessionTitle) {
-        var expSess = userStatus[userId].session.title;
+        //var expSess = userStatus[userId].session.title;
         delete userStatus[userId];
         bot.startPrivateConversation({user: userId}, function (err, convo) {
             if (err) {
@@ -1034,9 +1034,10 @@ controller.storage.teams.all(function(err,teams) {
             } else {
                 console.log("Sessions: " + sessions);
                 for (var i = 0; i < sessions.length; i++) {
-                    var sa = getAdminSessionAttach(sessions[i]);
+                    var sid = i+1;
+                    var sa = getAdminSessionAttach(sessions[i], sid);
                     if (sessions[i].session_id == activesessionId) {
-                        sa['title'] = "[ACTIVE!]";
+                        sa['title'] = "[this session is active for you just now!]";
                         attachs.unshift(sa);
                     } else {
                         attachs.push(sa);
@@ -1045,13 +1046,13 @@ controller.storage.teams.all(function(err,teams) {
                 if (attachs.length > 0) {
                     bot.reply(message, { attachments: attachs});
                 } else {
-                    bot.reply(message, {text: "I don\'t have any session. Create a new one typing `create session`"});
+                    bot.reply(message, {text: "I don\'t have any session. Create new one typing `create session`"});
                 }
             }
         });
     };
 
-    var getAdminSessionAttach = function(session) {
+    var getAdminSessionAttach = function(session, sId) {
         var fields = [
             {
                 "value": ">>>_Created on_ " + moment(session.creation).format("llll"),
@@ -1129,8 +1130,10 @@ controller.storage.teams.all(function(err,teams) {
             "fallback": "This attachment show session info",
             "color": randomColor(),
             "author_icon": "http://www.sur54.com.ar/data/upload/news_thumbs/1349385713-600pluma_escrito_thumb_550.jpg",
-            "author_name": "Session: " + session.topic.title,
-            "text": "_Purpose_: " + session.topic.purpose + "\n_created by_ @" + session.owner.name,
+            "author_name": sId  + ": " + session.topic.title,
+            "text": "_Purpose_: " + session.topic.purpose +
+            "\n_created by_ @" + session.owner.name +
+            "\n_Facets:_ " + session.topic.facets + "\n*_Session Settings:_*",
             // Dates
             "fields": fields
         };
@@ -1152,6 +1155,10 @@ controller.storage.teams.all(function(err,teams) {
                 });
             } else {
                 var sessionTitle = message.match[1];
+                if (userStatus[message.user]) {
+                    clearTimeout(userStatus[message.user].timer);
+                    delete userStatus[message.user];
+                }
                 askForSessionPurpose(bot, message, user, sessionTitle, function (err, sessionPurpose) {
                     if (err) {
                         convo.say("No session has been created... try again if you want");
@@ -1171,6 +1178,8 @@ controller.storage.teams.all(function(err,teams) {
                                 // TODO timeouts and global events
                                 // session expired for admin configs, corpus formation, feedback session, etc.
                                 allSessions.push(newSession);
+                                lastSessionId++;
+                                botSessions[bot.identity.id][lastSessionId] = newSession;
                                 // This user is in this session context. With specific help, and commands. bootstrapping time
                                 userStatus[user.id] = {
                                     session: newSession,
@@ -1179,7 +1188,7 @@ controller.storage.teams.all(function(err,teams) {
                                 };
                                 // TODO new help methods
                                 showSessionStatus(bot, message, newSession);
-                                replyUserHelp(bot, message, [], adminBootstrapHelp);
+                                replyUserHelp(bot, message, null, adminBootstrapHelp);
                             });
                     });
                 });
@@ -1236,7 +1245,7 @@ controller.storage.teams.all(function(err,teams) {
                                 };
                                 // TODO new help methods
                                 showSessionStatus(bot, message, newSession);
-                                replyUserHelp(bot, message, [], adminBootstrapHelp);
+                                replyUserHelp(bot, message, null, adminBootstrapHelp);
                             });
                         });
                     });
