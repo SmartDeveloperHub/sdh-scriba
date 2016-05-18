@@ -1302,9 +1302,10 @@ controller.storage.teams.all(function(err,teams) {
                     if (user.isRoot) {
                         // Admin or Organizer with an active session
                         //var sessionAttach = getAdminSessionAttach(activeSession.session);
-                        replyAdminSessionsInfo(bot, message, user, activeSession.session_id);
+                        replyAdminSessionsInfo(bot, message, user, activeSession.session.session_id);
                     } else {
                         // Regular user with an active session
+                        replyUserSessionsInfo(bot, message, user, activeSession.session.session_id);
                     }
                 }
             }
@@ -1315,6 +1316,8 @@ controller.storage.teams.all(function(err,teams) {
 // Init sessions
 var allSessions = [];
 var userStatus = [];
+var botSessions = {};
+var lastSessionId = 0;
 controller.storage.sessions.all(function (err, sessions) {
     if (err) {
         console.log('Error loading all sessions ');
@@ -1323,8 +1326,25 @@ controller.storage.sessions.all(function (err, sessions) {
         console.log(sessions);
         for (var i = 0; i < sessions.length; i++) {
             var ses = sessions[i];
-            if (ses.state == '') {
+            allSessions.push(ses);
+            if (!botSessions[ses.botFather]) {
+                botSessions[ses.botFather] = {};
+            }
+            lastSessionId++;
+            botSessions[ses.botFather][lastSessionId] = allSessions[i];
 
+            var sessionMoment = getSessionMoment(ses);
+            switch (sessionMoment) {
+                case 'boot':
+                    break;
+                case 'corpus':
+                    break;
+                case 'curate':
+                    break;
+                case 'feedback':
+                    break;
+                case 'finished':
+                    break;
             }
         }
     }
