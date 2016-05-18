@@ -852,7 +852,7 @@ controller.storage.teams.all(function(err,teams) {
 
     var showSessionStatus = function showSessionStatus(bot, message, session) {
         bot.reply(message, {
-            text: "New Session created:",
+            text: "Sellected Session:",
             attachments: [
                 {
                     "mrkdwn_in": ["text", "fields", 'fallback'],
@@ -931,7 +931,7 @@ controller.storage.teams.all(function(err,teams) {
     var askForSessionFacets = function askForSessionFacets(bot, message, user, sessionTitle, cb) {
         bot.startConversation(message, function (err, convo) {
             var timer = setSessionCTimer(bot, convo, message);
-            convo.ask('Do you want to add *facets* for your new session *' + sessionTitle + "*?.\nFacets will be used to Session-Questions categorization", [
+            convo.ask('I need *facets* for your new session *' + sessionTitle + "*?.\nFacets will be used to Session-Questions categorization\nPlease, type the new *facet/s* for *" + sessionTitle + "* session, separated by comma", [
                 {
                     pattern: bot.utterances.yes,
                     callback: function (response, convo) {
