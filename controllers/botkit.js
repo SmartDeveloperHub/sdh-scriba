@@ -880,15 +880,18 @@ controller.storage.teams.all(function(err,teams) {
 
     var askForSessionPurpose = function askForSessionPurpose(bot, message, user, sessionTitle, cb) {
         bot.startConversation(message, function (err, convo) {
-            //convo.ask('Do you want to add a *purpose* in your new session *' + sessionTitle + "*?", [
+            var timer = setSessionCTimer(bot, convo, message);
             convo.ask('Do you want to add a *purpose* in your new session *' + sessionTitle + "*?", [
                 {
                     pattern: bot.utterances.yes,
                     callback: function (response, convo) {
+                        clearTimeout(timer);
+                        timer = setSessionCTimer(bot, convo, message);
                         convo.ask('Great, type the new *purpose* for *' + sessionTitle + "* session", [
                             {
                                 pattern: /(.*)/i,
                                 callback: function (response, convo) {
+                                    clearTimeout(timer);
                                     convo.next();
                                     cb(null, response.text);
                                 }
@@ -896,6 +899,7 @@ controller.storage.teams.all(function(err,teams) {
                             {
                                 default: true,
                                 callback: function (response, convo) {
+                                    clearTimeout(timer);
                                     convo.next();
                                     cb("no purpose default");
                                 }
@@ -907,6 +911,7 @@ controller.storage.teams.all(function(err,teams) {
                 {
                     pattern: bot.utterances.no,
                     callback: function (response, convo) {
+                        clearTimeout(timer);
                         convo.next();
                         cb("no purpose");
                     }
@@ -914,6 +919,7 @@ controller.storage.teams.all(function(err,teams) {
                 {
                     default: true,
                     callback: function (response, convo) {
+                        clearTimeout(timer);
                         convo.next();
                         cb("no purpose");
                     }
@@ -924,14 +930,18 @@ controller.storage.teams.all(function(err,teams) {
 
     var askForSessionFacets = function askForSessionFacets(bot, message, user, sessionTitle, cb) {
         bot.startConversation(message, function (err, convo) {
+            var timer = setSessionCTimer(bot, convo, message);
             convo.ask('Do you want to add *facets* for your new session *' + sessionTitle + "*?.\nFacets will be used to Session-Questions categorization", [
                 {
                     pattern: bot.utterances.yes,
                     callback: function (response, convo) {
+                        clearTimeout(timer);
+                        timer = setSessionCTimer(bot, convo, message);
                         convo.ask('Great, type the new *facet/s* for *' + sessionTitle + "* session, separated by comma", [
                             {
                                 pattern: /(.*)/i,
                                 callback: function (response, convo) {
+                                    clearTimeout(timer);
                                     convo.next();
                                     var facetsArr = response.text.replaceAll(", ", ",").replaceAll(" ,", ",").split(',');
                                     console.log(facetsArr);
@@ -941,6 +951,7 @@ controller.storage.teams.all(function(err,teams) {
                             {
                                 default: true,
                                 callback: function (response, convo) {
+                                    clearTimeout(timer);
                                     convo.next();
                                     cb("no default facets");
                                 }
@@ -952,6 +963,7 @@ controller.storage.teams.all(function(err,teams) {
                 {
                     pattern: bot.utterances.no,
                     callback: function (response, convo) {
+                        clearTimeout(timer);
                         convo.next();
                         cb("no topic");
                     }
@@ -959,6 +971,7 @@ controller.storage.teams.all(function(err,teams) {
                 {
                     default: true,
                     callback: function (response, convo) {
+                        clearTimeout(timer);
                         convo.next();
                         cb("no topic");
                     }
@@ -967,12 +980,23 @@ controller.storage.teams.all(function(err,teams) {
         });
     };
 
+    var setSessionCTimer = function (bot, convo, message) {
+        var timer = setTimeout(function() {
+            bot.reply(message, 'You look busy. Try again later. No session has been created');
+            log.info('timer off!');
+            convo.stop();
+        }, 40000);
+        return timer;
+    };
+
     var askForSessionTitle = function askForSessionTitle(bot, message, user, cb) {
         bot.startConversation(message, function (err, convo) {
+            var timer = setSessionCTimer(bot, convo, message);
             convo.ask('I need a *title* for your new session, please type it now.', [
                 {
                     pattern: /(.*)/i,
                     callback: function (response, convo) {
+                        clearTimeout(timer);
                         convo.next();
                         cb(null, response.text);
                     }
@@ -980,6 +1004,7 @@ controller.storage.teams.all(function(err,teams) {
                 {
                     default: true,
                     callback: function (response, convo) {
+                        clearTimeout(timer);
                         convo.next();
                         cb("no title", "");
                     }
