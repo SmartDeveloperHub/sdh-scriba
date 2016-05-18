@@ -1254,6 +1254,45 @@ controller.storage.teams.all(function(err,teams) {
         });
     });
 
+    controller.hears(['setup session (.*)','set session (.*)', 'setup session','set session'], 'direct_message', function (bot, message) {
+        // is root?
+        isAdmin(message.user, message.team, function(isAd) {
+            if (!isAd) {
+                bot.reply(message, {
+                    "text": "This command is only for Admins"
+                });
+                return;
+            } else {
+                bs = botSessions[bot.identity.id];
+                // Check session ID or ask for id if not included
+                if (!bs) {
+                    bot.reply(message, "<@" + message.user + ">, There are no sessions now");
+                    return;
+                }
+                var sid = message.match[1];
+                var session = bs[sid];
+                if (!session) {
+                    bot.reply(message, "*" + sid + "* not found");
+                    return;
+                }
+                if (userStatus[message.user]) {
+                    clearTimeout(userStatus[message.user].timer);
+                    delete userStatus[message.user];
+                }
+                // other session active? no problem changig it
+                log.debug("setting up session: " + sid);
+                userStatus[message.user] = {
+                    session: session,
+                    interact: "setup",
+                    timer: setTimeout(launchSessionExpiration.bind(this, bot, message.user), 40000)
+                };
+                showSessionStatus(bot, message, session);
+
+            }
+        });
+
+    });
+
     controller.hears(['sessions','my sessions'], 'direct_message', function (bot, message) {
         // user info
         controller.storage.users.get(message.user, message.team, function(err, user) {
