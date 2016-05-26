@@ -1632,7 +1632,7 @@ controller.storage.sessions.all(function (err, sessions) {
         console.log('Error loading all sessions ');
     } else {
         console.log("** Init Sessions **");
-        console.log(sessions);
+        //console.log(sessions);
         for (var i = 0; i < sessions.length; i++) {
             var ses = sessions[i];
             allSessions.push(ses);
@@ -1645,14 +1645,19 @@ controller.storage.sessions.all(function (err, sessions) {
             var sessionMoment = getSessionMoment(ses);
             switch (sessionMoment) {
                 case 'boot':
+                    // Launch QP timer if QP period is defined
                     break;
                 case 'corpus':
+                    // Launch QP timer
                     break;
                 case 'curate':
+                    // Launch FP timer if FP period is defined
                     break;
                 case 'feedback':
+                    // Launch FP timer
                     break;
                 case 'finished':
+                    // Nothing...
                     break;
             }
         }
@@ -1660,8 +1665,10 @@ controller.storage.sessions.all(function (err, sessions) {
 });
 
 var resetExpirationPeriod = function resetExpirationPeriod(bot, user, session, time) {
-    clearTimeout(session.timer);
-    session.timer = setTimeout(launchSessionExpiration.bind(null, bot, user.id),time);
+    if (session.timer != null) {
+        clearTimeout(session.timer);
+    }
+    userStatus[user.id].timer = setTimeout(launchSessionExpiration.bind(null, bot, user.id),time);
 };
 
 var launchSessionExpiration = function launchSessionExpiration(bot, userId, sessionTitle) {
