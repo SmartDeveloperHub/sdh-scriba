@@ -336,6 +336,10 @@ controller.storage.teams.all(function(err,teams) {
     var getBotStatusMarkdown = function getBotStatusMarkdown(bot, cb) {
         getBotStatus(bot, function (status) {
             var theCreat = moment(status.created * 1000);
+            var adminUsers = [];
+            for (var i = 0; i < status.admins.length; i++) {
+                adminUsers.push("<@" + status.admins[i].id + ">");
+            }
             var md = {
                 //"text": "Status information for admins",
                 "attachments": [
@@ -354,7 +358,7 @@ controller.storage.teams.all(function(err,teams) {
                             },
                             {
                                 "title": "Admins",
-                                "value": ">>>" + status.admins,
+                                "value": ">>>" + adminUsers,
                                 "short": true
                             },
                             {
