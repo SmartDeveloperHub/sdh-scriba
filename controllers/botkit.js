@@ -1440,10 +1440,191 @@ controller.storage.teams.all(function(err,teams) {
         });
     });
 
+    //TODO clone from FP
+    controller.hears(['add QP (.*)'], 'direct_message', function (bot, message) {
+        var activeSession;
+        var user;
+        isAdmin(message.user, message.team, function (isRoot, localUser) {
+            user = localUser;
+            if(!isRoot) {
+                bot.reply(message, {text: "Only Organizers can add new Question Providers"});
+            } else {
+                activeSession = userStatus[message.user];
+                if (!activeSession) {
+                    bot.reply(message, {text: "First, you need to select a specific session `setup <SessionId>`, Inspect all available sessions with `sessions`"});
+                    return;
+                }
+                clearTimeout(activeSession.timer);
+                addQP();
+            }
+        });
+        var addQP = function() {
+            var params = message.match[1];
+            console.log("add QP " + message.match[1]);
+            if (params.indexOf('<@') >= 0) {
+                //Add users
+                var users = params.replaceAll(", ", " ").replaceAll(" ,", " ").replaceAll(",", " ").split(' ');
+                var nSlackUsers = [];
+                var nusers = [];
+                for (var i = 0; i < users.length; i++) {
+                    var u = users[i];
+                    if (u.length == 12 && u[0] == '<' && u[1] == '@' && u[u.length - 1] == '>') {
+                        // Slack user
+                        nusers.push(u.slice(2, 11).toUpperCase());
+                        nSlackUsers.push(u);
+                    }
+                }
+                updateSession(activeSession.session.session_id, {'QProviders': nusers}, function(err, newSession) {
+                    if (err) {
+                        bot.reply(message, {text: "Error adding new Question Providers in " + activeSession.session.topic.title});
+                    } else {
+                         userStatus[message.user] = {
+                            session: newSession,
+                            interact: "setup",
+                            timer: null
+                        };
+                        activeSession = newSession;
+                        successUsersReply(nusers, nSlackUsers);
+                    }
+                });
+
+            } else if (params.indexOf('<#') >= 0) {
+                // Add Channel users
+                bot.reply(message, "Adding all user in channel: " + message.match[1]);
+                getChannelUsers(bot, message.match[1], function(err, nusers, nSlackUsers) {
+                    if (err) {
+                        return;
+                    }
+                    updateSession(activeSession.session.session_id, {'QProviders': nusers}, function(err, newSession) {
+                        if (err) {
+                            bot.reply(message, {text: "Error adding new Question Providers in " + activeSession.session.topic.title});
+                        } else {
+                             userStatus[message.user] = {
+                                session: newSession,
+                                interact: "setup",
+                                timer: null
+                            };
+                            activeSession = newSession;
+                            successChannelReply(nusers, nSlackUsers);
+                        }
+                    });
+                });
+            } else {
+                bot.reply(message, "Unknown users: " + message.match[1]);
+            }
+        };
+        var successChannelReply = function successChannelReply(uIds, slackIds) {
+            if (!slackIds) {
+                bot.reply(message, "Unknown channel. Sorry");
+            } else {
+                bot.reply(message, "Added new Question Providers: " + slackIds);
+                resetExpirationPeriod(bot, user, activeSession, 40000);
+            }
+        };
+        var successUsersReply = function successUsersReply(uIds, slackIds) {
+            if (!slackIds) {
+                bot.reply(message, "Unknown users. Sorry");
+            } else {
+                bot.reply(message, "Added new Question Providers: " + slackIds);
+                resetExpirationPeriod(bot, user, activeSession, 40000);
+            }
+        };
+    });
+
+    controller.hears(['add FP (.*)'], 'direct_message', function (bot, message) {
+        var activeSession;
+        var user;
+        isAdmin(message.user, message.team, function (isRoot, localUser) {
+            user = localUser;
+            if(!isRoot) {
+                bot.reply(message, {text: "Only Organizers can add new Feedback Providers"});
+            } else {
+                activeSession = userStatus[message.user];
+                if (!activeSession) {
+                    bot.reply(message, {text: "First, you need to select a specific session `setup <SessionId>`, Inspect all available sessions with `sessions`"});
+                    return;
+                }
+                clearTimeout(activeSession.timer);
+                addFP();
+            }
+        });
+        var addFP = function() {
+            var params = message.match[1];
+            console.log("add FP " + message.match[1]);
+            if (params.indexOf('<@') >= 0) {
+                //Add users
+                var users = params.replaceAll(", ", " ").replaceAll(" ,", " ").replaceAll(",", " ").split(' ');
+                var nSlackUsers = [];
+                var nusers = [];
+                for (var i = 0; i < users.length; i++) {
+                    var u = users[i];
+                    if (u.length == 12 && u[0] == '<' && u[1] == '@' && u[u.length - 1] == '>') {
+                        // Slack user
+                        nusers.push(u.slice(2, 11).toUpperCase());
+                        nSlackUsers.push(u);
+                    }
+                }
+                updateSession(activeSession.session.session_id, {'FProviders': nusers}, function(err, newSession) {
+                    if (err) {
+                        bot.reply(message, {text: "Error adding new Feedback Providers in " + activeSession.session.topic.title});
+                    } else {
+                         userStatus[message.user] = {
+                            session: newSession,
+                            interact: "setup",
+                            timer: null
+                        };
+                        activeSession = newSession;
+                        successUsersReply(nusers, nSlackUsers);
+                    }
+                });
+
+            } else if (params.indexOf('<#') >= 0) {
+                // Add Channel users
+                bot.reply(message, "Adding all user in channel: " + message.match[1]);
+                getChannelUsers(bot, message.match[1], function(err, nusers, nSlackUsers) {
+                    if (err) {
+                        return;
+                    }
+                    updateSession(activeSession.session.session_id, {'FProviders': nusers}, function(err, newSession) {
+                        if (err) {
+                            bot.reply(message, {text: "Error adding new Feedback Providers in " + activeSession.session.topic.title});
+                        } else {
+                             userStatus[message.user] = {
+                                session: newSession,
+                                interact: "setup",
+                                timer: null
+                            };
+                            activeSession = newSession;
+                            successChannelReply(nusers, nSlackUsers);
+                        }
+                    });
+                });
+            } else {
+                bot.reply(message, "Unknown users: " + message.match[1]);
+            }
+        };
+        var successChannelReply = function successChannelReply(uIds, slackIds) {
+            if (!slackIds) {
+                bot.reply(message, "Unknown channel. Sorry");
+            } else {
+                bot.reply(message, "Added new Feedback Providers: " + slackIds);
+                resetExpirationPeriod(bot, user, activeSession, 40000);
+            }
+        };
+        var successUsersReply = function successUsersReply(uIds, slackIds) {
+            if (!slackIds) {
+                bot.reply(message, "Unknown users. Sorry");
+            } else {
+                bot.reply(message, "Added new Feedback Providers: " + slackIds);
+                resetExpirationPeriod(bot, user, activeSession, 40000);
+            }
+        };
+    });
+
 /* Timers & Session Controllers */
 // Init sessions
 var allSessions = [];
-var userStatus = [];
+var userStatus = {};
 var botSessions = {};
 var lastSessionId = 0;
 controller.storage.sessions.all(function (err, sessions) {
