@@ -1089,7 +1089,7 @@ controller.storage.teams.all(function(err,teams) {
                 console.log('Error searching sessions for ' + bot.identity.id + ' bot');
                 cb(err, attachs);
             } else {
-                console.log("Sessions: " + sessions);
+                console.log("Sessions: " + JSON.stringify(sessions));
                 for (var i = 0; i < sessions.length; i++) {
                     var sid = i+1;
                     var sa = getAdminSessionAttach(sessions[i], sid);
@@ -1195,6 +1195,33 @@ controller.storage.teams.all(function(err,teams) {
             "fields": fields
         };
     };
+
+    var getChannelUsers = function (bot, chid, cb) {
+        var slackUserIds = [];
+        var channelId;
+        if(chid.length == 12 && chid[0] == '<' && chid[1] == '#' && chid[chid.length-1] == '>') {
+            // Slack channel
+            channelId = chid.slice(2, 11);
+        } else if (chid.length == 9) {
+            channelId = chid;
+        } else {
+            bot.reply(message, chid + " channel not found");
+            cb("Unknown channel", null, null);
+        }
+        bot.api.channels.info({channel: channelId}, function (err, channelInfo) {
+            if (err) {
+                log.error(err);
+                bot.reply(message, '<#' + channelId + "> channel not found");
+                cb("Unknown channel", null, null);
+                return;
+            }
+            var uids = channelInfo.channel.members;
+            for (var i = 0; i < uids.length; i ++) {
+                slackUserIds.push("<@" + uids[i].toUpperCase() + ">");
+            }
+            cb(null, uids, slackUserIds);
+        });
+    }
 
     controller.hears(['create session (.*)','new session (.*)'], 'direct_message', function (bot, message) {
         isAdmin(message.user, message.team, function (isRoot, user) {
