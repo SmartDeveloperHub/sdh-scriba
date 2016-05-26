@@ -607,10 +607,10 @@ controller.storage.teams.all(function(err,teams) {
     var replyUserHelp = function replyUserHelp (bot, message, ufields, rfields) {
 
         var attach = [];
-        // Organizator help
+        // Organizer Commands
         if (rfields) {
             attach.push({
-                "fallback": "Organizator Help",
+                "fallback": "Organizer Commands",
                 "color": "#F00",
                 "author_name": "Organizator Help",
                 "author_icon": "https://sdh.conwet.fi.upm.es/assets/images/sdh_400ppp_RGB_imagotipo_small.png",
@@ -1403,40 +1403,6 @@ var launchSessionExpiration = function launchSessionExpiration(bot, userId, sess
     console.log("session " + sessionTitle + " expired for user: " + userId);
     adminSessionExpired(bot, userId, sessionTitle);
 };
-
-
-// Active process by events
-const util = require('util');
-const EventEmitter = require('events');
-
-function MyStream() {
-    EventEmitter.call(this);
-}
-
-util.inherits(MyStream, EventEmitter);
-
-MyStream.prototype.write = function(data) {
-    this.emit('data', data);
-};
-
-var stream = new MyStream();
-
-console.log(stream instanceof EventEmitter); // true
-console.log(MyStream.super_ === EventEmitter); // true
-
-stream.on('data', function(data) {
-    console.log('Received data: "${data}"');
-});
-stream.write('It works!'); // Received data: "It works!"
-
-
-/*var ringBell = function ringBell() {
-    console.log('ring ring ring');
-}
-eventEmitter.on('doorOpen', ringBell);
-
-eventEmitter.emit('doorOpen');*/
-
 
 /* DEPRECATED */
     controller.hears(['hello', 'hi'], 'direct_message', function (bot, message) {
