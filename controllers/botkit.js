@@ -1356,13 +1356,13 @@ controller.storage.teams.all(function(err,teams) {
                 bs = botSessions[bot.identity.id];
                 // Check session ID or ask for id if not included
                 if (!bs) {
-                    bot.reply(message, "<@" + message.user + ">, There are no sessions now");
+                    bot.reply(message, "<@" + message.user + ">, Unknown Session");
                     return;
                 }
                 var sid = message.match[1];
                 var session = bs[sid];
                 if (!session) {
-                    bot.reply(message, "*" + sid + "* not found");
+                    bot.reply(message, "Session *" + sid + "* not found");
                     return;
                 }
                 if (userStatus[message.user]) {
@@ -1377,7 +1377,6 @@ controller.storage.teams.all(function(err,teams) {
                     timer: setTimeout(launchSessionExpiration.bind(this, bot, message.user), 40000)
                 };
                 showSessionStatus(bot, message, session);
-
             }
         });
 
