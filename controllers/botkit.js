@@ -853,6 +853,59 @@ controller.storage.teams.all(function(err,teams) {
             }
         });
     };
+    var availableAttributes = ['topic', 'owner', 'session_id', 'topic.title', 'topic.purpose', 'topic.facets', 'owner',
+        'session_id', 'botFather', 'creation', 'QProviders', 'FProviders','questionCorpus','CFPeriod','FGPeriod',
+        'CFPeriod.from','FGPeriod.from','CFPeriod.to','FGPeriod.to'];
+
+    var normalizeSInfo = function normalizeSInfo(orig) {
+        result = {};
+        for (var key in orig) {
+            if (availableAttributes.indexOf(key) < 0) {
+                console.log("Unknown attribute " + key);
+            } else {
+                s = orig[key];
+                if (typeof s == "object" && !Array.isArray(s)) {
+                    result[key] = normalizeSInfo(s);
+                } else {
+                    result[key] = s;
+                }
+            }
+        }
+        return result;
+    };
+
+    /**
+     * Overwrites obj1's values with obj2's and adds obj2's if non existent in obj1
+     * @param obj1
+     * @param obj2
+     * @returns obj3 a new object based on obj1 and obj2
+     */
+    var mergeObjects = function mergeObjects(obj1,obj2){
+        var obj3 = {};
+        for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
+        for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
+        return obj3;
+    };
+
+    var updateSession = function updateSession(id, sessionInfo, cb) {
+        controller.storage.sessions.get(id, function (err, session) {
+            if (err) {
+                console.log('Error updating session ' + title);
+                cb(err, session);
+            } else {
+                if (!allSessions[session]) {
+                    console.log("allSessions fail")
+                }
+                var nsInfo = normalizeSInfo(sessionInfo);
+                var newSession = mergeObjects(session, nsInfo);// TODO Merge arrays
+
+                console.log("Session updated: " + newSession.topic.title);
+                // TODO update userSession
+
+                cb(err, newSession);
+            }
+        });
+    };
 
     var showSessionStatus = function showSessionStatus(bot, message, session) {
         bot.reply(message, {
